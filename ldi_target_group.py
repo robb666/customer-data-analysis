@@ -138,7 +138,7 @@ def uniqe_values():
 
 class Districts(NamedTuple):
     """Postal Address Numbers"""
-    voivodeship: str
+    district: str
     code_district: int
     city: str
     city_range: range
@@ -160,13 +160,25 @@ lodzki = Districts('lodzki', 9, 'Lodz', range(90, 95))
 def desdfg():
     counts = {}
     for data in uniqe_values():
-        if int(data['kod_poczt'][0]) == warszawski.code_district:
-            if warszawski.voivodeship not in counts:
-                counts[warszawski.voivodeship] = 0
-            counts[warszawski.voivodeship] += 1
-            if warszawski.city not in counts:
-                counts[warszawski.city] = 0
-            counts[warszawski.city] += 1
+        print(data['kod_poczt'])
+        if data['kod_poczt'] != '':
+            if int(data['kod_poczt'][0]) == warszawski.code_district:
+                if warszawski.district not in counts:
+                    counts[warszawski.district] = 0
+                counts[warszawski.district] += 1
+                if int(data['kod_poczt'][:2]) in warszawski.city_range and warszawski.city not in counts:
+                    counts[warszawski.city] = 0
+                counts[warszawski.city] += 1
+                # TODO --> z warszawaskiego:..., w tym z Warszawy:...
+
+            if int(data['kod_poczt'][0]) == lodzki.code_district:
+                if lodzki.district not in counts:
+                    counts[lodzki.district] = 0
+                counts[lodzki.district] += 1
+                if lodzki.city not in counts:
+                    counts[lodzki.city] = 0
+                counts[lodzki.city] += 1
+
     return counts
 
 print(desdfg())
