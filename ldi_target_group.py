@@ -139,7 +139,7 @@ def uniqe_values():
 class Districts(NamedTuple):
     """Postal Address Numbers"""
     voivodeship: str
-    postal_code: int
+    code_district: int
     city: str
     city_range: range
 
@@ -155,6 +155,21 @@ poznański = Districts('poznański i zielonogórski', 6, 'Poznan', range(60, 62)
 szczeciński = Districts('szczeciński i koszaliński', 7, 'Szczecin', range(70, 72))
 gdański = Districts('gdański i bydgoski', 8, 'Trojmiasto', range(80, 89))
 lodzki = Districts('lodzki', 9, 'Lodz', range(90, 95))
+
+
+def desdfg():
+    counts = {}
+    for data in uniqe_values():
+        if int(data['kod_poczt'][0]) == warszawski.code_district:
+            if warszawski.voivodeship not in counts:
+                counts[warszawski.voivodeship] = 0
+            counts[warszawski.voivodeship] += 1
+            if warszawski.city not in counts:
+                counts[warszawski.city] = 0
+            counts[warszawski.city] += 1
+    return counts
+
+print(desdfg())
 
 
 def age(): pass
@@ -175,11 +190,11 @@ def class_counts(rows):
 
 
 
-for data in uniqe_values():
-    # print(data)
-    birth_date = pesel_birth(data['nr_pesel'])
-    gender = pesel_gender(data['nr_pesel'])
-    print(data['kod_poczt'], birth_date, gender, data['nazwisko'])
+# for data in uniqe_values():
+#     # print(data)
+#     birth_date = pesel_birth(data['nr_pesel'])
+#     gender = pesel_gender(data['nr_pesel'])
+#     print(data['kod_poczt'], birth_date, gender, data['nazwisko'])
 
 
 
