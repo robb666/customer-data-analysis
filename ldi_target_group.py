@@ -159,7 +159,8 @@ lodzki = Districts('lodzki', 9, 'Lodz', range(90, 95))
 
 all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, lodzki]
 
-def desdfg(tuple_dist):
+
+def desdfg(all_dist):
     counts = {}
     for code in uniqe_values():
         for dist in all_dist:
@@ -190,7 +191,7 @@ def desdfg(tuple_dist):
 
     return counts
 
-print(desdfg(tuple_dist))
+print(desdfg(all_dist))
 
 
 def age(): pass
