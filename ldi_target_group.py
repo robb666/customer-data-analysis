@@ -162,12 +162,19 @@ all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski,
 
 def desdfg(all_dist):
     counts = {}
-    for code in uniqe_values():
+    for data in uniqe_values():
         for dist in all_dist:
-            if code['kod_poczt'] and int(code['kod_poczt'][0]) == dist.code_district:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == dist.code_district:
                 if dist.district not in counts:
                     counts[dist.district] = 0
                 counts[dist.district] += 1
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in dist.city_range:
+                if dist.city not in counts:
+                    counts[dist.city] = 0
+                counts[dist.city] += 1
+
+
+
 
 
             # print(data['kod_poczt'])
