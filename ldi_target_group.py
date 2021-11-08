@@ -155,33 +155,42 @@ poznański = Districts('poznański i zielonogórski', 6, 'Poznan', range(60, 62)
 szczeciński = Districts('szczeciński i koszaliński', 7, 'Szczecin', range(70, 72))
 gdański = Districts('gdański i bydgoski', 8, 'Trojmiasto', range(80, 89))
 lodzki = Districts('lodzki', 9, 'Lodz', range(90, 95))
+# counts = {} - tu zaladowac slownik
 
+all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, lodzki]
 
-def desdfg():
+def desdfg(tuple_dist):
     counts = {}
-    for data in uniqe_values():
-        print(data['kod_poczt'])
-        if data['kod_poczt'] != '':
-            if int(data['kod_poczt'][0]) == warszawski.code_district:
-                if warszawski.district not in counts:
-                    counts[warszawski.district] = 0
-                counts[warszawski.district] += 1
-                if int(data['kod_poczt'][:2]) in warszawski.city_range and warszawski.city not in counts:
-                    counts[warszawski.city] = 0
-                counts[warszawski.city] += 1
-                # TODO --> z warszawaskiego:..., w tym z Warszawy:...
+    for code in uniqe_values():
+        for dist in all_dist:
+            if code['kod_poczt'] and int(code['kod_poczt'][0]) == dist.code_district:
+                if dist.district not in counts:
+                    counts[dist.district] = 0
+                counts[dist.district] += 1
 
-            if int(data['kod_poczt'][0]) == lodzki.code_district:
-                if lodzki.district not in counts:
-                    counts[lodzki.district] = 0
-                counts[lodzki.district] += 1
-                if lodzki.city not in counts:
-                    counts[lodzki.city] = 0
-                counts[lodzki.city] += 1
+
+            # print(data['kod_poczt'])
+            # if data['kod_poczt'] != '':
+            #     if int(data['kod_poczt'][0]) == warszawski.code_district:
+            #         if warszawski.district not in counts:
+            #             counts[warszawski.district] = 0
+            #         counts[warszawski.district] += 1
+            #         if int(data['kod_poczt'][:2]) in warszawski.city_range and warszawski.city not in counts:
+            #             counts[warszawski.city] = 0
+            #         counts[warszawski.city] += 1
+            #         # TODO --> z warszawaskiego:..., w tym z Warszawy:...
+            #
+            #     if int(data['kod_poczt'][0]) == lodzki.code_district:
+            #         if lodzki.district not in counts:
+            #             counts[lodzki.district] = 0
+            #         counts[lodzki.district] += 1
+            #         if lodzki.city not in counts:
+            #             counts[lodzki.city] = 0
+            #         counts[lodzki.city] += 1
 
     return counts
 
-print(desdfg())
+print(desdfg(tuple_dist))
 
 
 def age(): pass
