@@ -137,27 +137,46 @@ def uniqe_values():
 
 
 class Districts(NamedTuple):
-    """Postal Address Numbers"""
+    """Postal Address Numbers 0-9."""
     district: str
-    code_district: int
+    district_code: int
+
+
+class Cities(NamedTuple):
     city: str
     city_range: range
 
 
-warszawski = Districts('warszawski', 0, 'Warsaw', range(0, 5))
-olsztynski = Districts('olsztynski i bialostocki', 1, 'Olsztyn', range(10, 11))
-# podlaskie = Voivodeships('podlaskie', 1, 'Bialystok', range(15, 16))
-lubelski = Districts('lubelski i kielecki', 2, 'Lublin', range(20, 21))
-krakowski = Districts('krakowski i rzeszowski', 3, 'Krakow', range(30, 32))
-katowicki = Districts('katowicki i opolski', 4, 'Katowice', range(40, 41))
-wrocławski = Districts('wrocławski', 5, 'Wroclaw', range(50, 55))
-poznański = Districts('poznański i zielonogórski', 6, 'Poznan', range(60, 62))
-szczeciński = Districts('szczeciński i koszaliński', 7, 'Szczecin', range(70, 72))
+warszawski = Districts('warszawski', 0)
+olsztynski = Districts('olsztyński i białostocki', 1)
+lubelski = Districts('lubelski i kielecki', 2)
+krakowski = Districts('krakowski i rzeszowski', 3)
+katowicki = Districts('katowicki i opolski', 4)
+wrocławski = Districts('wrocławski', 5)
+poznański = Districts('poznański i zielonogórski', 6)
+szczeciński = Districts('szczeciński i koszaliński', 7)
 gdański = Districts('gdański i bydgoski', 8, 'Trojmiasto', range(80, 89))
-lodzki = Districts('lodzki', 9, 'Lodz', range(90, 95))
-# counts = {} - tu zaladowac slownik
+łódzki = Districts('łódzki', 9, 'Lodz', range(90, 95))
+
 
 all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, lodzki]
+
+
+Warszawa = Cities('Warszawa', range(0, 5))
+Olsztyn = Cities('Olsztyn', range(10, 11))
+Białystok = Cities('Białystok', range(15, 16))
+Lublin = Cities('Lublin', range(20, 21))
+Kielce = Cities('Kielce', range(25, 26))
+Kraków = Cities('Krakow', range(30, 32))
+Rzeszów = Cities('Rzeszów', range(35, 36))
+Katowice = Cities('Katowice', range(40, 41))
+Opole = Cities('Opole', range(45, 46))
+Wrocław = Cities('Wroclaw', range(50, 55))
+Poznań = Cities('Poznan', range(60, 62))
+Zielona_Góra = Cities('Zielona Góra', range(65, 66))
+Szczecin = Cities('Szczecin', range(70, 72))
+Koszalin = Cities('Koszalin', range(75, 76))
+
 
 
 def desdfg(all_dist):
