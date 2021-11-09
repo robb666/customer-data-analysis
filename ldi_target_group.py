@@ -188,24 +188,34 @@ largest_cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzesz�
                   Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
 
 
-def desdfg(all_districts):
-    district_counts, city_counts = {}, {}
+def count_district(all_districts):
+    district_counts = {}
     for data in email_values():
-        for each in all_districts:
-            if data['kod_poczt'] and int(data['kod_poczt'][0]) == each.district_code:
-                if each.district not in district_counts:
-                    district_counts[each.district] = 0
-                district_counts[each.district] += 1
-        for each in largest_cities:
-            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in each.city_range:
-                if each.city not in city_counts:
-                    city_counts[each.city] = 0
-                city_counts[each.city] += 1
+        for count in all_districts:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == count.district_code:
+                if count.district not in district_counts:
+                    district_counts[count.district] = 0
+                district_counts[count.district] += 1
 
-    return district_counts, city_counts
+    return district_counts
 
 
-pprint(desdfg(all_districts))
+def count_city(largest_cities):
+    city_counts = {}
+    for data in email_values():
+        for count in largest_cities:
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in count.city_range:
+                if count.city not in city_counts:
+                    city_counts[count.city] = 0
+                city_counts[count.city] += 1
+
+    return city_counts
+
+
+# TODO -> 2x wykonuje "for data in email_values():" co spowalnia
+pprint(count_district(all_districts))
+print()
+pprint(count_city(largest_cities))
 
 
 def age(): pass
@@ -215,7 +225,6 @@ def class_counts(rows):
     """Counts the number of each type of example in a dataset."""
     counts = {}  # a dictionary of label -> count.
     for row in rows:
-        # in our dataset format, the label is always the last column
         label = row[-1]
         if label not in counts:
             counts[label] = 0
