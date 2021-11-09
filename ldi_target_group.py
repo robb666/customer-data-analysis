@@ -10,7 +10,9 @@ import re
 import phonenumbers
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from typing import NamedTuple
+from typing import NamedTuple, Union
+from itertools import chain
+
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 
@@ -144,7 +146,7 @@ class Districts(NamedTuple):
 
 class Cities(NamedTuple):
     city: str
-    city_range: range
+    city_range: Union[range, chain]
 
 
 warszawski = Districts('warszawski', 0)
@@ -155,11 +157,11 @@ katowicki = Districts('katowicki i opolski', 4)
 wrocławski = Districts('wrocławski', 5)
 poznański = Districts('poznański i zielonogórski', 6)
 szczeciński = Districts('szczeciński i koszaliński', 7)
-gdański = Districts('gdański i bydgoski', 8, 'Trojmiasto', range(80, 89))
-łódzki = Districts('łódzki', 9, 'Lodz', range(90, 95))
+gdański = Districts('gdański i bydgoski', 8)
+łódzki = Districts('łódzki', 9)
 
 
-all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, lodzki]
+all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, łódzki]
 
 
 Warszawa = Cities('Warszawa', range(0, 5))
@@ -176,7 +178,12 @@ Poznań = Cities('Poznan', range(60, 62))
 Zielona_Góra = Cities('Zielona Góra', range(65, 66))
 Szczecin = Cities('Szczecin', range(70, 72))
 Koszalin = Cities('Koszalin', range(75, 76))
+Trójmiasto = Cities('Trójmiasto', chain(range(80, 85), range(86, 89)))
+Bydgoszcz = Cities('Bydgoszcz', range(85, 86))
+Łódź = Cities('Łódź', range(90, 95))
 
+cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzeszów, Katowice, Opole,
+          Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
 
 
 def desdfg(all_dist):
