@@ -162,7 +162,8 @@ szczeciński = Districts('Okręg szczeciński i koszaliński', 7)
 gdański = Districts('Okręg gdański i bydgoski', 8)
 łódzki = Districts('Okręg łódzki', 9)
 
-all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, łódzki]
+all_districts = [warszawski, olsztynski, lubelski, krakowski, katowicki,
+                 wrocławski, poznański, szczeciński, gdański, łódzki]
 
 
 Warszawa = Cities('Warszawa', range(0, 5))
@@ -183,23 +184,23 @@ Trójmiasto = Cities('Trójmiasto', chain(range(80, 85), range(86, 89)))
 Bydgoszcz = Cities('Bydgoszcz', range(85, 86))
 Łódź = Cities('Łódź', range(90, 95))
 
-cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzeszów, Katowice, Opole,
-          Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
+largest_cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzeszów, Katowice, Opole,
+                  Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
 
 
-def desdfg(all_dist):
+def desdfg(all_districts):
     counts = {}
     for data in uniqe_values():
-        for dist in all_dist:
-            if data['kod_poczt'] and int(data['kod_poczt'][0]) == dist.district_code:
-                if dist.district not in counts:
-                    counts[dist.district] = 0
-                counts[dist.district] += 1
-        for city in cities:
-            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in city.city_range:
-                if city.city not in counts:
-                    counts[city.city] = 0
-                counts[city.city] += 1
+        for each in all_districts:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == each.district_code:
+                if each.district not in counts:
+                    counts[each.district] = 0
+                counts[each.district] += 1
+        for each in largest_cities:
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in each.city_range:
+                if each.city not in counts:
+                    counts[each.city] = 0
+                counts[each.city] += 1
 
 
 
@@ -226,7 +227,7 @@ def desdfg(all_dist):
 
     return counts
 
-pprint(desdfg(all_dist))
+pprint(desdfg(all_districts))
 
 
 def age(): pass
