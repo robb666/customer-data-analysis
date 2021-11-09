@@ -12,6 +12,7 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from typing import NamedTuple, Union
 from itertools import chain
+from pprint import pprint
 
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
@@ -145,21 +146,21 @@ class Districts(NamedTuple):
 
 
 class Cities(NamedTuple):
+    """Cities Address Numbers 00-94."""
     city: str
     city_range: Union[range, chain]
 
 
-warszawski = Districts('warszawski', 0)
-olsztynski = Districts('olsztyński i białostocki', 1)
-lubelski = Districts('lubelski i kielecki', 2)
-krakowski = Districts('krakowski i rzeszowski', 3)
-katowicki = Districts('katowicki i opolski', 4)
-wrocławski = Districts('wrocławski', 5)
-poznański = Districts('poznański i zielonogórski', 6)
-szczeciński = Districts('szczeciński i koszaliński', 7)
-gdański = Districts('gdański i bydgoski', 8)
-łódzki = Districts('łódzki', 9)
-
+warszawski = Districts('Okręg warszawski', 0)
+olsztynski = Districts('Okręg olsztyński i białostocki', 1)
+lubelski = Districts('Okręg lubelski i kielecki', 2)
+krakowski = Districts('Okręg krakowski i rzeszowski', 3)
+katowicki = Districts('Okręg katowicki i opolski', 4)
+wrocławski = Districts('Okręg wrocławski', 5)
+poznański = Districts('Okręg poznański i zielonogórski', 6)
+szczeciński = Districts('Okręg szczeciński i koszaliński', 7)
+gdański = Districts('Okręg gdański i bydgoski', 8)
+łódzki = Districts('Okręg łódzki', 9)
 
 all_dist = [warszawski, olsztynski, lubelski, krakowski, katowicki, wrocławski, poznański, szczeciński, gdański, łódzki]
 
@@ -190,14 +191,15 @@ def desdfg(all_dist):
     counts = {}
     for data in uniqe_values():
         for dist in all_dist:
-            if data['kod_poczt'] and int(data['kod_poczt'][0]) == dist.code_district:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == dist.district_code:
                 if dist.district not in counts:
                     counts[dist.district] = 0
                 counts[dist.district] += 1
-            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in dist.city_range:
-                if dist.city not in counts:
-                    counts[dist.city] = 0
-                counts[dist.city] += 1
+        for city in cities:
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in city.city_range:
+                if city.city not in counts:
+                    counts[city.city] = 0
+                counts[city.city] += 1
 
 
 
@@ -224,7 +226,7 @@ def desdfg(all_dist):
 
     return counts
 
-print(desdfg(all_dist))
+pprint(desdfg(all_dist))
 
 
 def age(): pass
