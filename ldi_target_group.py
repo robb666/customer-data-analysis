@@ -188,6 +188,11 @@ largest_cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzesz�
                   Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
 
 
+def label_values(): pass
+    # for data in email_values():
+    # ...
+
+
 def count_district(all_districts):
     district_counts = {}
     for data in email_values():
