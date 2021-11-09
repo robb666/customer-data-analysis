@@ -134,7 +134,7 @@ def pesel_gender(p):
         return 'K'
 
 
-def uniqe_values():
+def email_values():
     subjects = ldi_label()
     return {v['nr_pesel']: v for v in subjects}.values()
 
@@ -189,43 +189,21 @@ largest_cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzesz�
 
 
 def desdfg(all_districts):
-    counts = {}
-    for data in uniqe_values():
+    district_counts, city_counts = {}, {}
+    for data in email_values():
         for each in all_districts:
             if data['kod_poczt'] and int(data['kod_poczt'][0]) == each.district_code:
-                if each.district not in counts:
-                    counts[each.district] = 0
-                counts[each.district] += 1
+                if each.district not in district_counts:
+                    district_counts[each.district] = 0
+                district_counts[each.district] += 1
         for each in largest_cities:
             if data['kod_poczt'] and int(data['kod_poczt'][:2]) in each.city_range:
-                if each.city not in counts:
-                    counts[each.city] = 0
-                counts[each.city] += 1
+                if each.city not in city_counts:
+                    city_counts[each.city] = 0
+                city_counts[each.city] += 1
 
+    return district_counts, city_counts
 
-
-
-
-            # print(data['kod_poczt'])
-            # if data['kod_poczt'] != '':
-            #     if int(data['kod_poczt'][0]) == warszawski.code_district:
-            #         if warszawski.district not in counts:
-            #             counts[warszawski.district] = 0
-            #         counts[warszawski.district] += 1
-            #         if int(data['kod_poczt'][:2]) in warszawski.city_range and warszawski.city not in counts:
-            #             counts[warszawski.city] = 0
-            #         counts[warszawski.city] += 1
-            #         # TODO --> z warszawaskiego:..., w tym z Warszawy:...
-            #
-            #     if int(data['kod_poczt'][0]) == lodzki.code_district:
-            #         if lodzki.district not in counts:
-            #             counts[lodzki.district] = 0
-            #         counts[lodzki.district] += 1
-            #         if lodzki.city not in counts:
-            #             counts[lodzki.city] = 0
-            #         counts[lodzki.city] += 1
-
-    return counts
 
 pprint(desdfg(all_districts))
 
