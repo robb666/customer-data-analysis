@@ -238,57 +238,9 @@ def gender_percentage(gender_counts):
 
 
 forms_data = email_values()
+gender_counts = count_gender(forms_data)
+
 pprint(count_district(forms_data, all_districts))
 pprint(count_city(forms_data, largest_cities))
 pprint(count_age(forms_data))
-gender_counts = count_gender(forms_data)
-
 pprint(gender_percentage(gender_counts))
-
-
-
-
-
-
-def class_counts(rows):
-    """Counts the number of each type of example in a dataset."""
-    counts = {}  # a dictionary of label -> count.
-    for row in rows:
-        label = row[-1]
-        if label not in counts:
-            counts[label] = 0
-        counts[label] += 1
-    return counts
-
-
-
-
-
-# for data in uniqe_values():
-#     # print(data)
-#     birth_date = pesel_birth(data['nr_pesel'])
-#     gender = pesel_gender(data['nr_pesel'])
-#     print(data['kod_poczt'], birth_date, gender, data['nazwisko'])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
