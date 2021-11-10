@@ -1,6 +1,8 @@
 from __future__ import print_function
 import pickle
 import os.path
+import time
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -44,16 +46,18 @@ def ldi_label():
     service = build('gmail', 'v1', credentials=creds)
 
     today = date.today()
-    after = (today - timedelta(365)).strftime('%Y/%m/%d')
-    before = (today - timedelta(1)).strftime('%Y/%m/%d')
-
+    after = (today - timedelta(400)).strftime('%Y/%m/%d')
+    before = (today - timedelta(182)).strftime('%Y/%m/%d')
+    print(after, before)
     query = f'after:{after} before:{before}'
 
     results = service.users().messages().list(userId='me', labelIds=['Label_2190344206317955071'], q=query).execute()
     messages = results.get('messages', [])
 
     subjects = []
+    i = 0
     for message in messages:
+        # time.sleep(0.2)
         form = {}
         msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
         dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
@@ -89,6 +93,9 @@ def ldi_label():
         if not form['jezyk']:
             form['jezyk'] = 'PL'
 
+
+        i += 1
+        print(i)
         subjects.append(form)
     return subjects
 
@@ -191,6 +198,9 @@ def count_district(forms_data, all_districts):
                 if district.name not in district_counts:
                     district_counts[district.name] = 0
                 district_counts[district.name] += 1
+                if 'all' not in district_counts:
+                    district_counts['all'] = 0
+                district_counts['all'] += 1
     return district_counts
 
 
@@ -230,11 +240,16 @@ def count_gender(forms_data):
 
 
 def gender_percentage(gender_counts):
-    female = gender_counts['Female']
-    male = gender_counts['Male']
-    gender_counts['Female'] = str(round(female / (female + male) * 100)) + ' %'
-    gender_counts['Male'] = str(round(male / (female + male) * 100)) + ' %'
+    female = gender_counts['Females']
+    male = gender_counts['Males']
+    gender_counts['Females'] = str(round(female / (female + male) * 100)) + ' %'
+    gender_counts['Males'] = str(round(male / (female + male) * 100)) + ' %'
     return gender_counts
+
+
+def language(forms_data):
+    for data in forms_data:
+        print(data['jezyk'])
 
 
 forms_data = email_values()
@@ -244,3 +259,5 @@ pprint(count_district(forms_data, all_districts))
 pprint(count_city(forms_data, largest_cities))
 pprint(count_age(forms_data))
 pprint(gender_percentage(gender_counts))
+# language(forms_data)
+print(forms_data)
