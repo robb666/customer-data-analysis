@@ -130,8 +130,8 @@ def pesel_birth(p):
 def pesel_gender(p):
     if pesel_checksum(p):
         if int(p[-2]) % 2 == 1:
-            return 'M'
-        return 'K'
+            return 'Mężczyzn'
+        return 'Kobiet'
 
 
 def email_values():
@@ -205,14 +205,6 @@ def count_city(forms_data, largest_cities):
     return city_counts
 
 
-forms_data = email_values()
-pprint(count_district(forms_data, all_districts))
-pprint(count_city(forms_data, largest_cities))
-
-
-
-
-
 def count_age(forms_data):
     age_counts = {}
     for data in forms_data:
@@ -224,10 +216,28 @@ def count_age(forms_data):
     return age_counts
 
 
+def count_gender(forms_data):
+    gender_counts = {}
+    for data in forms_data:
+        pesel = data['nr_pesel']
+        if gender := pesel_gender(pesel):
+            if gender not in gender_counts:
+                gender_counts[gender] = 0
+            gender_counts[gender] += 1
+    return gender_counts
+
+
+forms_data = email_values()
+pprint(count_district(forms_data, all_districts))
+pprint(count_city(forms_data, largest_cities))
 pprint(count_age(forms_data))
+pprint(count_gender(forms_data))
 
 
-def count_gender(): pass
+
+
+
+
 
 
 def class_counts(rows):
