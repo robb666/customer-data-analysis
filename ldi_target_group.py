@@ -130,8 +130,8 @@ def pesel_birth(p):
 def pesel_gender(p):
     if pesel_checksum(p):
         if int(p[-2]) % 2 == 1:
-            return 'Male'
-        return 'Female'
+            return 'Males'
+        return 'Females'
 
 
 def email_values():
