@@ -82,7 +82,7 @@ def ldi_label():
             form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
 
         form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
-                                      re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
+                                 re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
 
         form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
                                                                                          dane_body) else ''
@@ -151,51 +151,41 @@ class Cities(NamedTuple):
     city_range: Union[range, chain]
 
 
-warszawski = Districts('Okręg warszawski', 0)
-olsztynski = Districts('Okręg olsztyński i białostocki', 1)
-lubelski = Districts('Okręg lubelski i kielecki', 2)
-krakowski = Districts('Okręg krakowski i rzeszowski', 3)
-katowicki = Districts('Okręg katowicki i opolski', 4)
-wrocławski = Districts('Okręg wrocławski', 5)
-poznański = Districts('Okręg poznański i zielonogórski', 6)
-szczeciński = Districts('Okręg szczeciński i koszaliński', 7)
-gdański = Districts('Okręg gdański i bydgoski', 8)
-łódzki = Districts('Okręg łódzki', 9)
-
-all_districts = [warszawski, olsztynski, lubelski, krakowski, katowicki,
-                 wrocławski, poznański, szczeciński, gdański, łódzki]
+all_districts = [Districts('Okręg warszawski', 0),
+                 Districts('Okręg olsztyński i białostocki', 1),
+                 Districts('Okręg lubelski i kielecki', 2),
+                 Districts('Okręg krakowski i rzeszowski', 3),
+                 Districts('Okręg katowicki i opolski', 4),
+                 Districts('Okręg wrocławski', 5),
+                 Districts('Okręg poznański i zielonogórski', 6),
+                 Districts('Okręg szczeciński i koszaliński', 7),
+                 Districts('Okręg gdański i bydgoski', 8),
+                 Districts('Okręg łódzki', 9)]
 
 
-Warszawa = Cities('Warszawa', range(0, 5))
-Olsztyn = Cities('Olsztyn', range(10, 11))
-Białystok = Cities('Białystok', range(15, 16))
-Lublin = Cities('Lublin', range(20, 21))
-Kielce = Cities('Kielce', range(25, 26))
-Kraków = Cities('Krakow', range(30, 32))
-Rzeszów = Cities('Rzeszów', range(35, 36))
-Katowice = Cities('Katowice', range(40, 41))
-Opole = Cities('Opole', range(45, 46))
-Wrocław = Cities('Wroclaw', range(50, 55))
-Poznań = Cities('Poznan', range(60, 62))
-Zielona_Góra = Cities('Zielona Góra', range(65, 66))
-Szczecin = Cities('Szczecin', range(70, 72))
-Koszalin = Cities('Koszalin', range(75, 76))
-Trójmiasto = Cities('Trójmiasto', chain(range(80, 85), range(86, 89)))
-Bydgoszcz = Cities('Bydgoszcz', range(85, 86))
-Łódź = Cities('Łódź', range(90, 95))
-
-largest_cities = [Warszawa, Olsztyn, Białystok, Lublin, Kielce, Kraków, Rzeszów, Katowice, Opole,
-                  Wrocław, Poznań, Zielona_Góra, Szczecin, Koszalin, Trójmiasto, Bydgoszcz, Łódź]
+largest_cities = [Cities('Warszawa', range(0, 5)),
+                  Cities('Olsztyn', range(10, 11)),
+                  Cities('Białystok', range(15, 16)),
+                  Cities('Lublin', range(20, 21)),
+                  Cities('Kielce', range(25, 26)),
+                  Cities('Krakow', range(30, 32)),
+                  Cities('Rzeszów', range(35, 36)),
+                  Cities('Katowice', range(40, 41)),
+                  Cities('Opole', range(45, 46)),
+                  Cities('Wroclaw', range(50, 55)),
+                  Cities('Poznan', range(60, 62)),
+                  Cities('Zielona Góra', range(65, 66)),
+                  Cities('Szczecin', range(70, 72)),
+                  Cities('Koszalin', range(75, 76)),
+                  Cities('Trójmiasto', chain(range(80, 85),
+                                             range(86, 89))),
+                  Cities('Bydgoszcz', range(85, 86)),
+                  Cities('Łódź', range(90, 95))]
 
 
-def label_values(): pass
-    # for data in email_values():
-    # ...
-
-
-def count_district(all_districts):
+def count_district(forms_data, all_districts):
     district_counts = {}
-    for data in email_values():
+    for data in forms_data:
         for count in all_districts:
             if data['kod_poczt'] and int(data['kod_poczt'][0]) == count.district_code:
                 if count.district not in district_counts:
@@ -205,9 +195,9 @@ def count_district(all_districts):
     return district_counts
 
 
-def count_city(largest_cities):
+def count_city(forms_data, largest_cities):
     city_counts = {}
-    for data in email_values():
+    for data in forms_data:
         for count in largest_cities:
             if data['kod_poczt'] and int(data['kod_poczt'][:2]) in count.city_range:
                 if count.city not in city_counts:
@@ -217,13 +207,15 @@ def count_city(largest_cities):
     return city_counts
 
 
-# TODO -> 2x wykonuje "for data in email_values():" co spowalnia
-pprint(count_district(all_districts))
-print()
-pprint(count_city(largest_cities))
+forms_data = email_values()
+pprint(count_district(forms_data, all_districts))
+pprint(count_city(forms_data, largest_cities))
 
 
-def age(): pass
+def count_age(): pass
+
+
+def count_gender(): pass
 
 
 def class_counts(rows):
