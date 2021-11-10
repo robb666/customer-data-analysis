@@ -140,13 +140,13 @@ def email_values():
 
 
 class Districts(NamedTuple):
-    """Postal Address Numbers 0-9."""
+    """Districts ZIP codes 0-9."""
     name: str
     code: int
 
 
 class Cities(NamedTuple):
-    """Cities Address Numbers 00-94."""
+    """Citie codes 00-94."""
     name: str
     code_range: Union[range, chain]
 
