@@ -146,7 +146,7 @@ class Districts(NamedTuple):
 
 
 class Cities(NamedTuple):
-    """Citie codes 00-94."""
+    """Cities postal codes range 00-94."""
     name: str
     code_range: Union[range, chain]
 
