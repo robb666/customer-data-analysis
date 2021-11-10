@@ -82,7 +82,7 @@ def ldi_label():
             form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
 
         form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
-                                 re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
+                                    re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
 
         form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
                                                                                          dane_body) else ''
@@ -141,14 +141,14 @@ def email_values():
 
 class Districts(NamedTuple):
     """Postal Address Numbers 0-9."""
-    district: str
-    district_code: int
+    name: str
+    code: int
 
 
 class Cities(NamedTuple):
     """Cities Address Numbers 00-94."""
-    city: str
-    city_range: Union[range, chain]
+    name: str
+    code_range: Union[range, chain]
 
 
 all_districts = [Districts('Okręg warszawski', 0),
@@ -172,8 +172,8 @@ largest_cities = [Cities('Warszawa', range(0, 5)),
                   Cities('Rzeszów', range(35, 36)),
                   Cities('Katowice', range(40, 41)),
                   Cities('Opole', range(45, 46)),
-                  Cities('Wroclaw', range(50, 55)),
-                  Cities('Poznan', range(60, 62)),
+                  Cities('Wrocław', range(50, 55)),
+                  Cities('Poznań', range(60, 62)),
                   Cities('Zielona Góra', range(65, 66)),
                   Cities('Szczecin', range(70, 72)),
                   Cities('Koszalin', range(75, 76)),
@@ -186,24 +186,22 @@ largest_cities = [Cities('Warszawa', range(0, 5)),
 def count_district(forms_data, all_districts):
     district_counts = {}
     for data in forms_data:
-        for count in all_districts:
-            if data['kod_poczt'] and int(data['kod_poczt'][0]) == count.district_code:
-                if count.district not in district_counts:
-                    district_counts[count.district] = 0
-                district_counts[count.district] += 1
-
+        for district in all_districts:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == district.code:
+                if district.name not in district_counts:
+                    district_counts[district.name] = 0
+                district_counts[district.name] += 1
     return district_counts
 
 
 def count_city(forms_data, largest_cities):
     city_counts = {}
     for data in forms_data:
-        for count in largest_cities:
-            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in count.city_range:
-                if count.city not in city_counts:
-                    city_counts[count.city] = 0
-                city_counts[count.city] += 1
-
+        for city in largest_cities:
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in city.code_range:
+                if city.name not in city_counts:
+                    city_counts[city.name] = 0
+                city_counts[city.name] += 1
     return city_counts
 
 
@@ -212,7 +210,21 @@ pprint(count_district(forms_data, all_districts))
 pprint(count_city(forms_data, largest_cities))
 
 
-def count_age(): pass
+
+
+
+def count_age(forms_data):
+    age_counts = {}
+    for data in forms_data:
+        pesel = data['nr_pesel']
+        if age := pesel_birth(pesel):
+            if age not in age_counts:
+                age_counts[age] = 0
+            age_counts[age] += 1
+    return age_counts
+
+
+pprint(count_age(forms_data))
 
 
 def count_gender(): pass
