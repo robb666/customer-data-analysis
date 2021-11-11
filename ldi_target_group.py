@@ -57,7 +57,6 @@ def ldi_label():
     subjects = []
     i = 0
     for message in messages:
-        # time.sleep(0.2)
         form = {}
         msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
         dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
