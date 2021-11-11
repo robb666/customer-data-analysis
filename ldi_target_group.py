@@ -47,11 +47,14 @@ def ldi_label():
 
     today = date.today()
     after = (today - timedelta(400)).strftime('%Y/%m/%d')
-    before = (today - timedelta(182)).strftime('%Y/%m/%d')
+    before = (today - timedelta(0)).strftime('%Y/%m/%d')
     print(after, before)
     query = f'after:{after} before:{before}'
 
-    results = service.users().messages().list(userId='me', labelIds=['Label_2190344206317955071'], q=query).execute()
+    results = service.users().messages().list(userId='me',
+                                              labelIds=['Label_2190344206317955071'],
+                                              maxResults=500,
+                                              q=query).execute()
     messages = results.get('messages', [])
 
     subjects = []
