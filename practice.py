@@ -38,15 +38,55 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 messages = []
 def add(id, msg, err):
     # id is given because this will not be called in the same order
-    if err:
-        print('ERROR')
-        print(err)
-    else:
-        messages.append(msg)
-        print(len(messages))
+    # if err:
+    #     print('ERROR')
+    #     print(err)
+    # else:
+    # messages.append(msg)
+    # print(len(messages))
+    # dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+    # print(dane_body)
+        form = {}
+        # msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
         dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-        print(dane_body)
+        #
+        # form['service'] = service
+        # form['message id'] = message['id']
+        form['imię'] = re.search('Imię:\s(\w+)', dane_body).group(1) if re.search('Imię:\s(\w+)',
+                                                                                       dane_body) else ''
+        form['nazwisko'] = dane_body.split('<br>')[1].rstrip().split(' ')[-1]
+        if form['nazwisko'] == 'Nazwisko:':
+            form['nazwisko'] = ''
+        form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', dane_body).group(1) if \
+            re.search('Nr. rej.:\s([\w\d]+)', dane_body) else ''
+        form['nr_pesel'] = re.search('Pesel:\s(\w+)', dane_body).group(1) if \
+            re.search('Pesel:\s(\w+)', dane_body) else ''
+        form['nr_regon'] = re.search('Regon:\s(\w+)', dane_body).group(1) if \
+            re.search('Regon:\s(\w+)', dane_body) else ''
+        form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', dane_body).group(1) if \
+            re.search('E-mail:\s([\w])\s?', dane_body) else ''
+        form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', dane_body).group(1) if \
+            re.search('Kod pocztowy:\s([\d-]+)', dane_body) else ''
+        form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', dane_body).group(1) if \
+            re.search('Telefon:\s(\d{8,13})', dane_body) else ''
+        if form['nr_telefonu'] != '':
+            validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
+            form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
 
+        form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
+                                    re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
+
+        form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
+                                                                                         dane_body) else ''
+        if not form['jezyk']:
+            form['jezyk'] = 'PL'
+
+        print(form)
+    #     i += 1
+    #     print(i)
+    #     subjects.append(form)
+    # return subjects
+    #
 
 def result(service, query, pageToken=None):
     results = service.users().messages().list(userId='me',
@@ -55,12 +95,13 @@ def result(service, query, pageToken=None):
                                               pageToken=pageToken,
                                               q=query).execute()
 
-    if 'nextPageToken' in results:
-        return service.users().messages().list(userId='me',
-                                               labelIds=['Label_2190344206317955071'],
-                                               maxResults=100,
-                                               pageToken=pageToken,
-                                               q=query).execute(), results.get('nextPageToken')
+    # if 'nextPageToken' in results:
+        # return service.users().messages().list(userId='me',
+        #                                        labelIds=['Label_2190344206317955071'],
+        #                                        maxResults=100,
+        #                                        pageToken=pageToken,
+        #                                        q=query).execute(), \
+        # return results, results.get('nextPageToken')
 
     return results, results.get('nextPageToken')
 
@@ -93,16 +134,14 @@ def ldi_label():
     today = date.today()
     after = (today - timedelta(400)).strftime('%Y/%m/%d')
     before = (today - timedelta(0)).strftime('%Y/%m/%d')
-    print(after, before)
+
     query = f'after:{after} before:{before}'
 
     page_token = None
     while True:
-        results, page_token = result(service, query, page_token)
-        print(results)
-
-        messages = results.get('messages', [])
         batch = service.new_batch_http_request()
+        results, page_token = result(service, query, page_token)
+        messages = results.get('messages', [])
 
         for message in messages:
             msg = service.users().messages().get(userId='me',
@@ -113,71 +152,6 @@ def ldi_label():
 
         if page_token is None:
             break
-
-
-
-
-
-
-
-
-        # body = base64.urlsafe_b64decode(msg.get('payload').get('body').get('data').encode('ASCII')).decode('utf-8')
-
-
-
-
-
-    # pageToken = None
-    # if 'nextPageToken' in results:
-    #     pageToken = results['nextPageToken']
-    #     print(pageToken)
-
-
-
-
-    # messages_ids = results.get('messages', [])
-    # subjects = []
-    # batch = service.new_batch_http_request()
-    # messages = results.get('messages', [])
-
-    # while pageToken:
-    #     results = service.users().messages().list(userId='me',
-    #                                               labelIds=['Label_2190344206317955071'],
-    #                                               maxResults=500,
-    #                                               pageToken=pageToken,
-    #                                               q=query).execute()
-    #     # messages_ids = results.get('messages', [])
-    #
-    #     if 'nextPageToken' in results:
-    #         pageToken = results['nextPageToken']
-    #         # messages_ids.extend(results.get('messages', []))
-    #     else:
-    #         print('No more messages')
-    #         break
-    #
-    #     messages = results.get('messages', [])
-
-    # for message in messages:
-    #     msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
-    #
-    #     dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-    #
-    #     print(dane_body)
-
-    #     i = 0
-    #     for message in messages_ids:
-    #         form = {}
-    #         if i < 100:
-    #             msg = service.users().messages().get(userId='me', id=message['id'], format='full')
-    #             batch.add(msg, add)
-    #         else:
-    #             batch.execute()
-    #             print('No more messages')
-    #         i += 1
-    #
-    #
-    #
-    # print(batch)
 
 
     # dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
