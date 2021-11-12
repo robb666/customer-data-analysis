@@ -1,0 +1,540 @@
+from __future__ import print_function
+import concurrent.futures
+import time
+import traceback
+from io import StringIO
+import logging
+import os
+import sys
+# import do_loginmotru
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import re
+import phonenumbers
+from typing import NamedTuple, Union
+from itertools import chain
+
+
+import pickle
+import os.path
+import time
+
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from datetime import date, timedelta
+import base64
+import re
+import phonenumbers
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from typing import NamedTuple, Union
+from itertools import chain
+from pprint import pprint
+
+
+SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
+
+messages = []
+def add(id, msg, err):
+    # id is given because this will not be called in the same order
+    if err:
+        print('ERROR')
+        print(err)
+    else:
+        messages.append(msg)
+        print(len(messages))
+        dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+        print(dane_body)
+
+
+def result(service, query, pageToken=None):
+    results = service.users().messages().list(userId='me',
+                                              labelIds=['Label_2190344206317955071'],
+                                              maxResults=100,
+                                              pageToken=pageToken,
+                                              q=query).execute()
+
+    if 'nextPageToken' in results:
+        return service.users().messages().list(userId='me',
+                                               labelIds=['Label_2190344206317955071'],
+                                               maxResults=100,
+                                               pageToken=pageToken,
+                                               q=query).execute(), results.get('nextPageToken')
+
+    return results, results.get('nextPageToken')
+
+
+def ldi_label():
+    """Bada"""
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server()
+
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('gmail', 'v1', credentials=creds)
+
+    today = date.today()
+    after = (today - timedelta(400)).strftime('%Y/%m/%d')
+    before = (today - timedelta(0)).strftime('%Y/%m/%d')
+    print(after, before)
+    query = f'after:{after} before:{before}'
+
+    page_token = None
+    while True:
+        results, page_token = result(service, query, page_token)
+        print(results)
+
+        messages = results.get('messages', [])
+        batch = service.new_batch_http_request()
+
+        for message in messages:
+            msg = service.users().messages().get(userId='me',
+                                                 id=message['id'],
+                                                 format='full')
+            batch.add(msg, add)
+        batch.execute()
+
+        if page_token is None:
+            break
+
+
+
+
+
+
+
+
+        # body = base64.urlsafe_b64decode(msg.get('payload').get('body').get('data').encode('ASCII')).decode('utf-8')
+
+
+
+
+
+    # pageToken = None
+    # if 'nextPageToken' in results:
+    #     pageToken = results['nextPageToken']
+    #     print(pageToken)
+
+
+
+
+    # messages_ids = results.get('messages', [])
+    # subjects = []
+    # batch = service.new_batch_http_request()
+    # messages = results.get('messages', [])
+
+    # while pageToken:
+    #     results = service.users().messages().list(userId='me',
+    #                                               labelIds=['Label_2190344206317955071'],
+    #                                               maxResults=500,
+    #                                               pageToken=pageToken,
+    #                                               q=query).execute()
+    #     # messages_ids = results.get('messages', [])
+    #
+    #     if 'nextPageToken' in results:
+    #         pageToken = results['nextPageToken']
+    #         # messages_ids.extend(results.get('messages', []))
+    #     else:
+    #         print('No more messages')
+    #         break
+    #
+    #     messages = results.get('messages', [])
+
+    # for message in messages:
+    #     msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
+    #
+    #     dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+    #
+    #     print(dane_body)
+
+    #     i = 0
+    #     for message in messages_ids:
+    #         form = {}
+    #         if i < 100:
+    #             msg = service.users().messages().get(userId='me', id=message['id'], format='full')
+    #             batch.add(msg, add)
+    #         else:
+    #             batch.execute()
+    #             print('No more messages')
+    #         i += 1
+    #
+    #
+    #
+    # print(batch)
+
+
+    # dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+    #
+    # print(dane_body)
+        # form['service'] = service
+        # form['message id'] = message['id']
+        # form['imię'] = re.search('Imię:\s(\w+)', dane_body).group(1) if re.search('Imię:\s(\w+)',
+        #                                                                                dane_body) else ''
+        # form['nazwisko'] = dane_body.split('<br>')[1].rstrip().split(' ')[-1]
+        # if form['nazwisko'] == 'Nazwisko:':
+        #     form['nazwisko'] = ''
+        # form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', dane_body).group(1) if \
+        #     re.search('Nr. rej.:\s([\w\d]+)', dane_body) else ''
+        # form['nr_pesel'] = re.search('Pesel:\s(\w+)', dane_body).group(1) if \
+        #     re.search('Pesel:\s(\w+)', dane_body) else ''
+        # form['nr_regon'] = re.search('Regon:\s(\w+)', dane_body).group(1) if \
+        #     re.search('Regon:\s(\w+)', dane_body) else ''
+        # form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', dane_body).group(1) if \
+        #     re.search('E-mail:\s([\w])\s?', dane_body) else ''
+        # form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', dane_body).group(1) if \
+        #     re.search('Kod pocztowy:\s([\d-]+)', dane_body) else ''
+        # form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', dane_body).group(1) if \
+        #     re.search('Telefon:\s(\d{8,13})', dane_body) else ''
+        # if form['nr_telefonu'] != '':
+        #     validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
+        #     form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
+        #
+        # form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
+        #                             re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
+        #
+        # form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
+        #                                                                                  dane_body) else ''
+        # if not form['jezyk']:
+        #     form['jezyk'] = 'PL'
+
+
+    #     i += 1
+    #     print(i)
+    #     subjects.append(form)
+    # return subjects
+
+
+print(ldi_label())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # Create a range that does not contain 50
+# for i in [x for x in range(100) if x != 50]:
+#     print(i)
+
+# Create 2 ranges [0,49] and [51, 100]
+# from itertools import chain
+# concatenated = chain(range(50), range(51, 100))
+# for i in concatenated:
+#     print(i)
+
+
+
+# class Cities(NamedTuple):
+#     city: str
+#     city_range: Union[range, chain]
+#
+#
+# Trójmiasto = Cities('Trójmiasto', chain(range(80, 85), range(86, 89)))
+#
+#
+# for i in Trójmiasto.city_range:
+#     print(i)
+
+
+# # Create a iterator and skip 50
+# xr = iter(range(100))
+# for i in xr:
+#     print(i)
+#     if i == 49:
+#         next(xr)
+
+# # Simply continue in the loop if the number is 50
+# for i in range(100):
+#     if i == 50:
+#         continue
+#     print(i)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# dane_body = 'Imię: Rui Ramos<br>Nazwisko: Rui Ramos<br>Nr. rej.: PKR16531<br>Pesel: 78082119653<br>Regon: <br>' \
+#        'E-mail: ruimailramos@gmail.com<br>Kod pocztowy: 96-325<br>Telefon: 669155117<br>Raty: true<br>Język: EN'
+
+# dane_body = 'Imię: Pawel<br>Nazwisko: Jan<br>Nr. rej.: Ptu2641f<br>Pesel: 81010200141<br>Regon: <br>' \
+#        'E-mail: Mocarmen3321@gmail.com<br>Kod pocztowy: 00-001<br>Telefon: <br>Raty: true<br>Język: EN'
+
+# dane_body = 'Imię: david<br>Nazwisko: hoyland<br>Nr. rej.: elc51438<br>Pesel: 70062017694<br>Regon: <br>' \
+#             'E-mail: david.hoyland@halocreativedesign.com<br>Kod pocztowy: 99-423<br>Telefon: 0789324027<br>Raty: false<br>Język: EN'
+
+# dane_body = 'Imię: robert<br>Nazwisko: grzelak<br>Nr. rej.: el4c079<br>Pesel: 82082407038<br>Regon: <br>' \
+#             'E-mail: robert.patryk.grzelak@gmail.com<br>Kod pocztowy: 90-441<br>Telefon: <br>Raty: false<br>Język: EN'
+
+
+# print(dane_body)
+# print()
+#
+# dane = [i.split()[-1] for i in dane_body.split('<br>')]
+#
+# print(dane)
+# print()
+
+
+# formularz = {}
+#
+#
+# formularz['imię'] = re.search('Imię:\s(\w+)', dane_body).group(1)
+# formularz['nazwisko'] = dane_body.split('<br>')[1].rstrip().split(' ')[-1]
+# formularz['nr_rej'] = dane[2] if 2 < len(dane[2]) <= 8 else ''
+# # formularz['anglik'] = True if dane[4] == 'prawa' else False
+# formularz['nr_pesel'] = dane[3] if re.search('^\d{11}$', dane[3]) else ''
+# formularz['nr_regon'] = dane[4] if re.search('^\d{9}$', dane[4]) else ''
+# formularz['adres_email'] = dane[5].rstrip()
+# formularz['kod_poczt'] = dane[6] if re.search('^\d{2}-\d{3}$', dane[6]) else ''
+# formularz['nr_telefonu'] = dane[7] if re.search('\d{9}', dane[7]) else ''
+# if formularz['nr_telefonu'] != '':
+#     validate_phone = phonenumbers.parse(formularz['nr_telefonu'], 'PL')
+#     formularz['nr_telefonu']= '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
+#
+# formularz['2_raty'] = True if dane[8] == 'true' else False
+# formularz['jezyk'] = dane[-1]
+#
+#
+#
+# print(formularz)
+
+
+
+
+
+
+
+# my_model = ['X5 3.0D', '']
+# li = any([X in model for X in ('X3', 'X5') for model in my_model[0].split()])
+# print(li)
+
+# # '82082407038'
+# # '00213103073'
+# # pesel = '00213103073'
+# # pesel = '02302710110'
+# pesel = '02302710110'
+# # pesel = '82082407038'
+#
+# if pesel.startswith('0') and pesel[2] in ['2', '3']:
+#     year, month, day = pesel[:2], str(int(pesel[2:4]) - 20).zfill(2), pesel[4:]
+#     pesel = year + month + day
+#     print(id(pesel))
+# print(id(pesel))
+# dt = datetime.strptime(pesel[:6], '%y%m%d')
+# if dt > datetime.now() and not str(dt).startswith('0'):
+#     dt -= relativedelta(years=100)
+# my_license = (dt + relativedelta(years=19)).strftime('%d.%m.%Y')
+#
+# print(my_license)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# di = {   'DMC': '1560',
+#          'Data pierwszej rejestracji': '21.06.2002',
+#          'Import': 'tak',
+#          'Kierownica po prawej stronie': 'NIE',
+#          'Liczba miejsc': '5',
+#          'Liczba współwłaścicieli': '1',
+#          'Marka': 'MERCEDES-BENZ',
+#          'Masa pojazdu': '1175',
+#          'Moc': '70 kW',
+#          'Model': 'A 170',
+#          'Numer VIN': 'WDB1680091J630375',
+#          'Numer rejestracyjny': 'RPZ32556',
+#          'Paliwo': 'Olej napędowy',
+#          'Pierwsza rejestracja w Polsce': '29.06.2017',
+#          'Podrodzaj': 'hatchback',
+#          'Pojazd wyposażony w instalację LPG': 'NIE',
+#          'Pojemność': '1689 cm3',
+#          'Przebieg': '326062',
+#          'Rodzaj pojazdu': 'Samochód osobowy',
+#          'Rok produkcji': '2001',
+#          'Specjalne użytkowanie': '-',
+#          'Termin następnego bad. tech.': '19.09.2019',
+#          'Ważność OC': 'Brak info',
+#          'Właściciel nr': '1',
+#          'Ładowność pojazdu': '385'}
+#
+#
+#
+#
+# print(int(di['Przebieg'][:2]) + int(di['Przebieg'][:2]))
+
+
+
+
+
+
+
+
+"""LOG"""
+# os.chdir('/home/robb/Desktop/PROJEKTY/ldi/ldi2')
+#
+#
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+# formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:line %(lineno)d:%(message)s')
+# file_handler = logging.FileHandler('log/practice.log')
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
+#
+#
+# do_loginmotru.zero()
+#
+#
+#
+# # try:
+# def one():
+#     time.sleep(.9)
+#     logging.info('First')
+#     return False
+#
+#
+# def two():
+#     try:
+#         # time.sleep(.4) + n
+#         logger.info('two')
+#     except:
+#         logger.critical(sys.exc_info())
+#     return True
+#
+#
+# def three():
+#     time.sleep(1.1)
+#     logger.info('Third')
+#     return False
+#
+# tasks = [one, two, three]
+# executor = concurrent.futures.ThreadPoolExecutor()
+# futures = [executor.submit(t) for t in tasks]
+# for t in concurrent.futures.as_completed(futures):
+#     if t.result():
+#         break
+#
+#
+# # with open('log', 'w+') as file:
+# #     file.write(traceback.print_exc())
+#
+# logger.info("Just an information")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import trace
+# tracer = trace.Trace()
+# # for task in tasks:
+# tracer.run('two()')
+#
+# r = tracer.results()
+#
+# r.write_results(show_missing=True, coverdir=os.getcwd())
+
+
+
+
+
+
+# def one():
+#     print('Start 1')
+#     time.sleep(1)
+#     print('Pierwsza')
+#     return True
+#
+# d = threading.Thread(name='one', target=one)
+# d.setDaemon(True)
+#
+# def two():
+#     print('Start 2')
+#     time.sleep(3)
+#     print('Druga')
+#     return False
+#
+#
+# t = threading.Thread(name='two', target=two)
+#
+# d.start()
+# t.start()
+#
+# d.join()
+# t.join()
+
+
+
+
+
+
+
+
+
+
+
