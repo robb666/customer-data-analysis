@@ -154,47 +154,6 @@ def ldi_label():
             break
 
 
-    # dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-    #
-    # print(dane_body)
-        # form['service'] = service
-        # form['message id'] = message['id']
-        # form['imię'] = re.search('Imię:\s(\w+)', dane_body).group(1) if re.search('Imię:\s(\w+)',
-        #                                                                                dane_body) else ''
-        # form['nazwisko'] = dane_body.split('<br>')[1].rstrip().split(' ')[-1]
-        # if form['nazwisko'] == 'Nazwisko:':
-        #     form['nazwisko'] = ''
-        # form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', dane_body).group(1) if \
-        #     re.search('Nr. rej.:\s([\w\d]+)', dane_body) else ''
-        # form['nr_pesel'] = re.search('Pesel:\s(\w+)', dane_body).group(1) if \
-        #     re.search('Pesel:\s(\w+)', dane_body) else ''
-        # form['nr_regon'] = re.search('Regon:\s(\w+)', dane_body).group(1) if \
-        #     re.search('Regon:\s(\w+)', dane_body) else ''
-        # form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', dane_body).group(1) if \
-        #     re.search('E-mail:\s([\w])\s?', dane_body) else ''
-        # form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', dane_body).group(1) if \
-        #     re.search('Kod pocztowy:\s([\d-]+)', dane_body) else ''
-        # form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', dane_body).group(1) if \
-        #     re.search('Telefon:\s(\d{8,13})', dane_body) else ''
-        # if form['nr_telefonu'] != '':
-        #     validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
-        #     form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
-        #
-        # form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
-        #                             re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
-        #
-        # form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
-        #                                                                                  dane_body) else ''
-        # if not form['jezyk']:
-        #     form['jezyk'] = 'PL'
-
-
-    #     i += 1
-    #     print(i)
-    #     subjects.append(form)
-    # return subjects
-
-
 print(ldi_label())
 
 
