@@ -141,7 +141,7 @@ def pesel_birth(p):
 
 
 def pesel_gender(p):
-    if pesel_checksum(p):
+    if pesel_birth(p):
         if int(p[-2]) % 2 == 1:
             return 'Males'
         return 'Females'
@@ -150,7 +150,6 @@ def pesel_gender(p):
 def eliminate_duplicates(subjects):
     return {v['nr_pesel']: v for v in subjects}.values()
 
-# 1799248ce092f668
 
 def eliminate_falsyficates(subjects):
     false = ['00000000000', '10101011111', '22222222222', '44444444444', '66666666666', '88888888888']
@@ -288,16 +287,8 @@ subjects = []
 service = authentication()
 batch_request(service)
 
-
-
 forms_data = eliminate_duplicates(subjects)
-# print(forms_data)
-print()
 forms_data = eliminate_falsyficates(forms_data)
-print(forms_data)
-# print([i['nr_pesel'] for i in forms_data])
-
-
 
 gender_counts = count_gender(forms_data)
 lang_counts = language(forms_data)
