@@ -150,6 +150,17 @@ def pesel_gender(p):
 def eliminate_duplicates(subjects):
     return {v['nr_pesel']: v for v in subjects}.values()
 
+# 1799248ce092f668
+
+def eliminate_falsyficates(subjects):
+    false = ['00000000000', '10101011111', '22222222222', '44444444444', '66666666666', '88888888888']
+    for item in subjects:
+        if item['nr_pesel'] in false or len(item['nr_pesel']) != 11 and not item['nr_regon']:
+            item['nr_pesel'] = ''
+        if re.search('[0-9]', item['imię']):
+            item['nr_pesel'] = ''
+    return subjects
+
 
 class Districts(NamedTuple):
     """Districts ZIP codes 0-9."""
@@ -203,9 +214,9 @@ def count_district(forms_data, all_districts):
                 if district.name not in district_counts:
                     district_counts[district.name] = 0
                 district_counts[district.name] += 1
-                # if 'all clients' not in district_counts:
-                #     district_counts['all clients'] = 0
-                # district_counts['all clients'] += 1
+                if 'all clients' not in district_counts:
+                    district_counts['all clients'] = 0
+                district_counts['all clients'] += 1
     return district_counts
 
 
@@ -253,19 +264,49 @@ def gender_percentage(gender_counts):
 
 
 def language(forms_data):
+    language_counts = {'PL': 0,
+                       'EN': 0}
     for data in forms_data:
-        print(data['jezyk'])
+        lang = data['jezyk']
+        if lang == 'PL':
+            language_counts['PL'] += 1
+        else:
+            language_counts['EN'] += 1
+    return language_counts
+
+
+def language_percentage(lang_counts):
+    pl = lang_counts['PL']
+    en = lang_counts['EN']
+    lang_counts['PL'] = str(round(pl / (pl + en) * 100)) + ' %'
+    lang_counts['EN'] = str(round(en / (pl + en) * 100)) + ' %'
+    return lang_counts
+
 
 
 subjects = []
 service = authentication()
 batch_request(service)
+
+
+
 forms_data = eliminate_duplicates(subjects)
+# print(forms_data)
+print()
+forms_data = eliminate_falsyficates(forms_data)
+print(forms_data)
+# print([i['nr_pesel'] for i in forms_data])
+
+
+
 gender_counts = count_gender(forms_data)
+lang_counts = language(forms_data)
 
 pprint(count_district(forms_data, all_districts))
 pprint(count_city(forms_data, largest_cities))
 pprint(count_age(forms_data))
+pprint(count_gender(forms_data))
 pprint(gender_percentage(gender_counts))
-# language(forms_data)
-# print(forms_data)
+pprint(language(forms_data))
+pprint(language_percentage(lang_counts))
+
