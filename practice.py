@@ -35,18 +35,11 @@ from pprint import pprint
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-subjects = []
-def add(id, msg, err):
 
-    # print(id)
-    # print(msg)
-    # print(err)
-    # subjects.append()
-    # msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
+def _add(id, msg, err):
+
     body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-    # print(body)
-    # form['service'] = service
-    # while msg:
+
     form = {}
     form['message id'] = msg['id']
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
@@ -78,19 +71,10 @@ def add(id, msg, err):
     if not form['jezyk']:
         form['jezyk'] = 'PL'
 
-    # print(form)
     subjects.append(form)
-    # return subjects
-    # subjects.append(form)
-    # print(subjects)
-    # return subjects
-    #     i += 1
-    #     print(i)
-    #     subjects.append(form)
-    # return subjects
-    #
 
-def retrive(service, query, pageToken=None):
+
+def _retrive(service, query, pageToken=None):
     results = service.users().messages().list(userId='me',
                                               labelIds=['Label_2190344206317955071'],
                                               maxResults=100,
@@ -129,21 +113,21 @@ def ldi_label():
     page_token = None
     while True:
         batch = service.new_batch_http_request()
-        results, page_token = retrive(service, query, page_token)
+        results, page_token = _retrive(service, query, page_token)
         messages = results.get('messages', [])
 
         for message in messages:
             msg = service.users().messages().get(userId='me',
                                                  id=message['id'],
                                                  format='full')
-            batch.add(msg, callback=add)
+            batch.add(msg, callback=_add)
         batch.execute()
         if page_token is None:
             break
 
 
-print(ldi_label())
-
+subjects = []
+ldi_label()
 print(subjects)
 
 

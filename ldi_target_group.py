@@ -20,17 +20,61 @@ from pprint import pprint
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 
 
+def _add(ids, msg, err):
+
+    body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+
+    form = {}
+    form['message id'] = msg['id']
+    form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
+                                                                                   body) else ''
+    form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
+    if form['nazwisko'] == 'Nazwisko:':
+                        form['nazwisko'] = ''
+    form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', body).group(1) if \
+                        re.search('Nr. rej.:\s([\w\d]+)', body) else ''
+    form['nr_pesel'] = re.search('Pesel:\s(\w+)', body).group(1) if \
+                        re.search('Pesel:\s(\w+)', body) else ''
+    form['nr_regon'] = re.search('Regon:\s(\w+)', body).group(1) if \
+                        re.search('Regon:\s(\w+)', body) else ''
+    form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', body).group(1) if \
+                        re.search('E-mail:\s([\w])\s?', body) else ''
+    form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', body).group(1) if \
+                        re.search('Kod pocztowy:\s([\d-]+)', body) else ''
+    form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', body).group(1) if \
+                        re.search('Telefon:\s(\d{8,13})', body) else ''
+    if form['nr_telefonu'] != '':
+        validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
+        form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
+
+    form['2_raty'] = True if re.search('Raty:\s(\w+)', body) and \
+                                re.search('Raty:\s(\w+)', body).group(1) == 'true' else False
+
+    form['jezyk'] = re.search('Język:\s(\w+)', body).group(1) if re.search('Język:\s(\w+)',
+                                                                                     body) else ''
+    if not form['jezyk']:
+        form['jezyk'] = 'PL'
+
+    subjects.append(form)
+
+
+def _retrive(service, query, pageToken=None):
+    results = service.users().messages().list(userId='me',
+                                              labelIds=['Label_2190344206317955071'],
+                                              maxResults=100,
+                                              pageToken=pageToken,
+                                              q=query).execute()
+    return results, results.get('nextPageToken')
+
+
 def ldi_label():
     """Bada"""
     creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
 
-    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -39,7 +83,6 @@ def ldi_label():
                 'credentials.json', SCOPES)
             creds = flow.run_local_server()
 
-        # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
@@ -48,58 +91,23 @@ def ldi_label():
     today = date.today()
     after = (today - timedelta(400)).strftime('%Y/%m/%d')
     before = (today - timedelta(0)).strftime('%Y/%m/%d')
-    print(after, before)
+
     query = f'after:{after} before:{before}'
 
-    results = service.users().messages().list(userId='me',
-                                              labelIds=['Label_2190344206317955071'],
-                                              maxResults=500,
-                                              q=query).execute()
-    messages = results.get('messages', [])
+    page_token = None
+    while True:
+        batch = service.new_batch_http_request()
+        results, page_token = _retrive(service, query, page_token)
+        messages = results.get('messages', [])
 
-    subjects = []
-    i = 0
-    for message in messages:
-        form = {}
-        msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
-        dane_body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-
-        form['service'] = service
-        form['message id'] = message['id']
-        form['imię'] = re.search('Imię:\s(\w+)', dane_body).group(1) if re.search('Imię:\s(\w+)',
-                                                                                       dane_body) else ''
-        form['nazwisko'] = dane_body.split('<br>')[1].rstrip().split(' ')[-1]
-        if form['nazwisko'] == 'Nazwisko:':
-            form['nazwisko'] = ''
-        form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', dane_body).group(1) if \
-            re.search('Nr. rej.:\s([\w\d]+)', dane_body) else ''
-        form['nr_pesel'] = re.search('Pesel:\s(\w+)', dane_body).group(1) if \
-            re.search('Pesel:\s(\w+)', dane_body) else ''
-        form['nr_regon'] = re.search('Regon:\s(\w+)', dane_body).group(1) if \
-            re.search('Regon:\s(\w+)', dane_body) else ''
-        form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', dane_body).group(1) if \
-            re.search('E-mail:\s([\w])\s?', dane_body) else ''
-        form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', dane_body).group(1) if \
-            re.search('Kod pocztowy:\s([\d-]+)', dane_body) else ''
-        form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', dane_body).group(1) if \
-            re.search('Telefon:\s(\d{8,13})', dane_body) else ''
-        if form['nr_telefonu'] != '':
-            validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
-            form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
-
-        form['2_raty'] = True if re.search('Raty:\s(\w+)', dane_body) and \
-                                    re.search('Raty:\s(\w+)', dane_body).group(1) == 'true' else False
-
-        form['jezyk'] = re.search('Język:\s(\w+)', dane_body).group(1) if re.search('Język:\s(\w+)',
-                                                                                         dane_body) else ''
-        if not form['jezyk']:
-            form['jezyk'] = 'PL'
-
-
-        i += 1
-        print(i)
-        subjects.append(form)
-    return subjects
+        for message in messages:
+            msg = service.users().messages().get(userId='me',
+                                                 id=message['id'],
+                                                 format='full')
+            batch.add(msg, callback=_add)
+        batch.execute()
+        if page_token is None:
+            break
 
 
 def pesel_checksum(p):
@@ -143,8 +151,9 @@ def pesel_gender(p):
         return 'Females'
 
 
-def email_values():
-    subjects = ldi_label()
+def eliminate_duplicates(subjects):
+    # subjects = ldi_label()
+
     return {v['nr_pesel']: v for v in subjects}.values()
 
 
@@ -254,7 +263,10 @@ def language(forms_data):
         print(data['jezyk'])
 
 
-forms_data = email_values()
+subjects = []
+ldi_label()
+
+forms_data = eliminate_duplicates(subjects)
 gender_counts = count_gender(forms_data)
 
 pprint(count_district(forms_data, all_districts))
@@ -262,4 +274,4 @@ pprint(count_city(forms_data, largest_cities))
 pprint(count_age(forms_data))
 pprint(gender_percentage(gender_counts))
 # language(forms_data)
-print(forms_data)
+# print(forms_data)
