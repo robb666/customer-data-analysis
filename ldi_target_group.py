@@ -2,7 +2,6 @@ from __future__ import print_function
 import pickle
 import os.path
 import time
-
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -17,14 +16,12 @@ from itertools import chain
 from pprint import pprint
 
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 
 def _add(ids, msg, err):
-
-    body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-
     form = {}
+    body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
     form['message id'] = msg['id']
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
@@ -49,7 +46,6 @@ def _add(ids, msg, err):
 
     form['2_raty'] = True if re.search('Raty:\s(\w+)', body) and \
                                 re.search('Raty:\s(\w+)', body).group(1) == 'true' else False
-
     form['jezyk'] = re.search('Język:\s(\w+)', body).group(1) if re.search('Język:\s(\w+)',
                                                                                      body) else ''
     if not form['jezyk']:
@@ -67,14 +63,11 @@ def _retrive(service, query, pageToken=None):
     return results, results.get('nextPageToken')
 
 
-def ldi_label():
-    """Bada"""
+def authentication():
     creds = None
-
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
-
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -86,8 +79,11 @@ def ldi_label():
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
-    service = build('gmail', 'v1', credentials=creds)
+    return build('gmail', 'v1', credentials=creds)
 
+
+def batch_request(service):
+    """Batch request to Gmail API."""
     today = date.today()
     after = (today - timedelta(400)).strftime('%Y/%m/%d')
     before = (today - timedelta(0)).strftime('%Y/%m/%d')
@@ -111,7 +107,7 @@ def ldi_label():
 
 
 def pesel_checksum(p):
-    """Suma kontrolna nr pesel."""
+    """Pesel checksum."""
     if p and len(p) == 11:
         weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3, 1]
         control_n = p[-1]
@@ -141,7 +137,7 @@ def pesel_birth(p):
                 return dt.year
             return dt.year
         except ValueError as e:
-            return f'Pesel date not valid. -> {e}'
+            return f'Pesel birth date error. -> {e}'
 
 
 def pesel_gender(p):
@@ -152,8 +148,6 @@ def pesel_gender(p):
 
 
 def eliminate_duplicates(subjects):
-    # subjects = ldi_label()
-
     return {v['nr_pesel']: v for v in subjects}.values()
 
 
@@ -209,9 +203,9 @@ def count_district(forms_data, all_districts):
                 if district.name not in district_counts:
                     district_counts[district.name] = 0
                 district_counts[district.name] += 1
-                if 'all' not in district_counts:
-                    district_counts['all'] = 0
-                district_counts['all'] += 1
+                # if 'all clients' not in district_counts:
+                #     district_counts['all clients'] = 0
+                # district_counts['all clients'] += 1
     return district_counts
 
 
@@ -264,8 +258,8 @@ def language(forms_data):
 
 
 subjects = []
-ldi_label()
-
+service = authentication()
+batch_request(service)
 forms_data = eliminate_duplicates(subjects)
 gender_counts = count_gender(forms_data)
 
