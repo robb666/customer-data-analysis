@@ -12,7 +12,6 @@ import phonenumbers
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from typing import NamedTuple, Union
-from collections import OrderedDict
 from itertools import chain
 from pprint import pprint
 
@@ -269,14 +268,6 @@ def count_gender(forms_data):
     return gender_counts
 
 
-# def gender_percentage(gender_counts):
-#     female = gender_counts['Females']
-#     male = gender_counts['Males']
-#     gender_counts['Females'] = str(round(female / (female + male) * 100)) + ' %'
-#     gender_counts['Males'] = str(round(male / (female + male) * 100)) + ' %'
-#     return gender_counts
-
-
 def count_language(forms_data):
     language_counts = {'PL': 0,
                        'EN': 0}
@@ -289,14 +280,6 @@ def count_language(forms_data):
     return language_counts
 
 
-# def language_percentage(lang_counts):
-#     pl = lang_counts['PL']
-#     en = lang_counts['EN']
-#     lang_counts['PL'] = str(round(pl / (pl + en) * 100)) + ' %'
-#     lang_counts['EN'] = str(round(en / (pl + en) * 100)) + ' %'
-#     return lang_counts
-
-
 subjects = []
 service = authentication()
 batch_request(service)
@@ -304,18 +287,15 @@ batch_request(service)
 forms_data = eliminate_duplicates(subjects)
 forms_data = eliminate_falsyficates(forms_data)
 
-
 district_counts = count_district(forms_data, all_districts)
 city_counts = count_city(forms_data, largest_cities)
 gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
 
-
 pprint(percentage(district_counts))
 pprint(percentage(city_counts))
 pprint(percentage(gender_counts))
 pprint(percentage(lang_counts))
-# pprint(count_age(forms_data))
 pprint(percentage(age_counts))
 
