@@ -148,16 +148,17 @@ def pesel_gender(p):
 
 
 def eliminate_duplicates(subjects):
-    return {v['nr_pesel']: v for v in subjects}.values()
+    return list({v['nr_pesel']: v for v in subjects}.values())
 
 
 def eliminate_falsyficates(subjects):
     false = ['00000000000', '10101011111', '22222222222', '44444444444', '66666666666', '88888888888']
     for item in subjects:
-        if item['nr_pesel'] in false or len(item['nr_pesel']) != 11 and not item['nr_regon']:
-            item['nr_pesel'] = ''
-        if re.search('[0-9]', item['imię']):
-            item['nr_pesel'] = ''
+        if item['nr_pesel'] in false or \
+                len(item['nr_pesel']) != 11 and \
+                not item['nr_regon'] or \
+                re.search('[0-9]', item['imię']):
+            subjects.remove(item)
     return subjects
 
 
@@ -288,16 +289,24 @@ service = authentication()
 batch_request(service)
 
 forms_data = eliminate_duplicates(subjects)
-forms_data = eliminate_falsyficates(forms_data)
-
-gender_counts = count_gender(forms_data)
-lang_counts = language(forms_data)
-
+print(forms_data)
 pprint(count_district(forms_data, all_districts))
-pprint(count_city(forms_data, largest_cities))
-pprint(count_age(forms_data))
-pprint(count_gender(forms_data))
-pprint(gender_percentage(gender_counts))
-pprint(language(forms_data))
-pprint(language_percentage(lang_counts))
+
+
+forms_data = eliminate_falsyficates(forms_data)
+print('\n\n\n\n\n\n\n\n')
+print(forms_data)
+
+
+
+# gender_counts = count_gender(forms_data)
+# lang_counts = language(forms_data)
+#
+pprint(count_district(forms_data, all_districts))
+# pprint(count_city(forms_data, largest_cities))
+# pprint(count_age(forms_data))
+# pprint(count_gender(forms_data))
+# pprint(gender_percentage(gender_counts))
+# pprint(language(forms_data))
+# pprint(language_percentage(lang_counts))
 
