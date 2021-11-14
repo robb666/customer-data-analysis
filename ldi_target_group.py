@@ -229,6 +229,8 @@ def percentage(counts: dict) -> list:
 
 
 def sort_dict(di: dict) -> list:
+    if isinstance(list(di.keys())[0], int):
+        return sorted(di.items(), key=lambda x: x[0])
     return sorted(di.items(), key=lambda x: x[1], reverse=True)
 
 
@@ -307,12 +309,13 @@ district_counts = count_district(forms_data, all_districts)
 city_counts = count_city(forms_data, largest_cities)
 gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
-
+age_counts = count_age(forms_data)
 
 
 pprint(percentage(district_counts))
 pprint(percentage(city_counts))
 pprint(percentage(gender_counts))
 pprint(percentage(lang_counts))
-pprint(count_age(forms_data))
+# pprint(count_age(forms_data))
+pprint(percentage(age_counts))
 
