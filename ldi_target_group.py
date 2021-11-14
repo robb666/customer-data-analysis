@@ -8,11 +8,14 @@ from google.auth.transport.requests import Request
 from datetime import date, timedelta
 import base64
 import re
+import numpy as np
 import phonenumbers
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from typing import NamedTuple, Union
 from itertools import chain
+import matplotlib.pyplot as plt
+import seaborn as sns
 from pprint import pprint
 
 
@@ -280,6 +283,36 @@ def count_language(forms_data):
     return language_counts
 
 
+
+
+
+def plot_districts():pass
+
+
+def plot_cities():pass
+
+
+def plot_gender(gender_arr):
+    names = ['group_a', 'group_b', 'group_c']
+    values = [1, 10, 100]
+
+    plt.figure(figsize=(9, 3))
+
+    plt.subplot(131)
+    plt.bar(names, values)
+    plt.subplot(132)
+    plt.scatter(names, values)
+    plt.subplot(133)
+    plt.plot(names, values)
+    plt.suptitle('Categorical Plotting')
+    plt.show()
+
+
+def plot_age():pass
+
+
+
+
 subjects = []
 service = authentication()
 batch_request(service)
@@ -295,7 +328,9 @@ age_counts = count_age(forms_data)
 
 pprint(percentage(district_counts))
 pprint(percentage(city_counts))
-pprint(percentage(gender_counts))
+gender_arr = percentage(gender_counts)
+pprint(gender_arr)
 pprint(percentage(lang_counts))
 pprint(percentage(age_counts))
 
+# plot_gender(gender_arr)

@@ -13,12 +13,11 @@ import re
 import phonenumbers
 from typing import NamedTuple, Union
 from itertools import chain
-
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 import pickle
 import os.path
 import time
-
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -33,102 +32,140 @@ from itertools import chain
 from pprint import pprint
 
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+def plot_gender(arr):
+    names = ['Males', 'Females']
+    # values = [84.6, 15.4]
+    names, values = list(map(lambda x, y: x[0], y[1], [('Males', 84.6), ('Females', 15.4)]))
+    print(names, values)
+    # plt.figure(figsize=(5, 5))
+    #
+    # # plt.subplot()
+    # plt.bar(names, values)
+    # # plt.subplot(132)
+    # # plt.scatter(names, values)
+    # # plt.subplot(133)
+    # # plt.plot(names, values)
+    # plt.suptitle('Płeć osób składających zapytania.')
+    # plt.show()
 
 
-def _add(id, msg, err):
-
-    body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
-
-    form = {}
-    form['message id'] = msg['id']
-    form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
-                                                                                   body) else ''
-    form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
-    if form['nazwisko'] == 'Nazwisko:':
-                        form['nazwisko'] = ''
-    form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', body).group(1) if \
-                        re.search('Nr. rej.:\s([\w\d]+)', body) else ''
-    form['nr_pesel'] = re.search('Pesel:\s(\w+)', body).group(1) if \
-                        re.search('Pesel:\s(\w+)', body) else ''
-    form['nr_regon'] = re.search('Regon:\s(\w+)', body).group(1) if \
-                        re.search('Regon:\s(\w+)', body) else ''
-    form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', body).group(1) if \
-                        re.search('E-mail:\s([\w])\s?', body) else ''
-    form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', body).group(1) if \
-                        re.search('Kod pocztowy:\s([\d-]+)', body) else ''
-    form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', body).group(1) if \
-                        re.search('Telefon:\s(\d{8,13})', body) else ''
-    if form['nr_telefonu'] != '':
-        validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
-        form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
-
-    form['2_raty'] = True if re.search('Raty:\s(\w+)', body) and \
-                                re.search('Raty:\s(\w+)', body).group(1) == 'true' else False
-
-    form['jezyk'] = re.search('Język:\s(\w+)', body).group(1) if re.search('Język:\s(\w+)',
-                                                                                     body) else ''
-    if not form['jezyk']:
-        form['jezyk'] = 'PL'
-
-    subjects.append(form)
+arr = [('Males', 84.6), ('Females', 15.4)]
+plot_gender(arr)
 
 
-def _retrive(service, query, pageToken=None):
-    results = service.users().messages().list(userId='me',
-                                              labelIds=['Label_2190344206317955071'],
-                                              maxResults=100,
-                                              pageToken=pageToken,
-                                              q=query).execute()
-    return results, results.get('nextPageToken')
 
 
-def ldi_label():
-    """Bada"""
-    creds = None
-
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server()
-
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('gmail', 'v1', credentials=creds)
-
-    today = date.today()
-    after = (today - timedelta(400)).strftime('%Y/%m/%d')
-    before = (today - timedelta(0)).strftime('%Y/%m/%d')
-
-    query = f'after:{after} before:{before}'
-
-    page_token = None
-    while True:
-        batch = service.new_batch_http_request()
-        results, page_token = _retrive(service, query, page_token)
-        messages = results.get('messages', [])
-
-        for message in messages:
-            msg = service.users().messages().get(userId='me',
-                                                 id=message['id'],
-                                                 format='full')
-            batch.add(msg, callback=_add)
-        batch.execute()
-        if page_token is None:
-            break
 
 
-subjects = []
-ldi_label()
-print(subjects)
+
+
+
+
+
+
+
+
+
+
+
+
+# SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+
+# def _add(id, msg, err):
+#
+#     body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+#
+#     form = {}
+#     form['message id'] = msg['id']
+#     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
+#                                                                                    body) else ''
+#     form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
+#     if form['nazwisko'] == 'Nazwisko:':
+#                         form['nazwisko'] = ''
+#     form['nr_rej'] = re.search('Nr. rej.:\s([\w\d]+)', body).group(1) if \
+#                         re.search('Nr. rej.:\s([\w\d]+)', body) else ''
+#     form['nr_pesel'] = re.search('Pesel:\s(\w+)', body).group(1) if \
+#                         re.search('Pesel:\s(\w+)', body) else ''
+#     form['nr_regon'] = re.search('Regon:\s(\w+)', body).group(1) if \
+#                         re.search('Regon:\s(\w+)', body) else ''
+#     form['adres_email'] = re.search('E-mail:\s(.*)\s?<br>Kod', body).group(1) if \
+#                         re.search('E-mail:\s([\w])\s?', body) else ''
+#     form['kod_poczt'] = re.search('Kod pocztowy:\s([\d-]+)', body).group(1) if \
+#                         re.search('Kod pocztowy:\s([\d-]+)', body) else ''
+#     form['nr_telefonu'] = re.search('Telefon:\s(\d{8,13})', body).group(1) if \
+#                         re.search('Telefon:\s(\d{8,13})', body) else ''
+#     if form['nr_telefonu'] != '':
+#         validate_phone = phonenumbers.parse(form['nr_telefonu'], 'PL')
+#         form['nr_telefonu'] = '+' + str(validate_phone.country_code) + str(validate_phone.national_number)
+#
+#     form['2_raty'] = True if re.search('Raty:\s(\w+)', body) and \
+#                                 re.search('Raty:\s(\w+)', body).group(1) == 'true' else False
+#
+#     form['jezyk'] = re.search('Język:\s(\w+)', body).group(1) if re.search('Język:\s(\w+)',
+#                                                                                      body) else ''
+#     if not form['jezyk']:
+#         form['jezyk'] = 'PL'
+#
+#     subjects.append(form)
+#
+#
+# def _retrive(service, query, pageToken=None):
+#     results = service.users().messages().list(userId='me',
+#                                               labelIds=['Label_2190344206317955071'],
+#                                               maxResults=100,
+#                                               pageToken=pageToken,
+#                                               q=query).execute()
+#     return results, results.get('nextPageToken')
+#
+#
+# def ldi_label():
+#     """Bada"""
+#     creds = None
+#
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+#
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file(
+#                 'credentials.json', SCOPES)
+#             creds = flow.run_local_server()
+#
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+#
+#     service = build('gmail', 'v1', credentials=creds)
+#
+#     today = date.today()
+#     after = (today - timedelta(400)).strftime('%Y/%m/%d')
+#     before = (today - timedelta(0)).strftime('%Y/%m/%d')
+#
+#     query = f'after:{after} before:{before}'
+#
+#     page_token = None
+#     while True:
+#         batch = service.new_batch_http_request()
+#         results, page_token = _retrive(service, query, page_token)
+#         messages = results.get('messages', [])
+#
+#         for message in messages:
+#             msg = service.users().messages().get(userId='me',
+#                                                  id=message['id'],
+#                                                  format='full')
+#             batch.add(msg, callback=_add)
+#         batch.execute()
+#         if page_token is None:
+#             break
+#
+#
+# subjects = []
+# ldi_label()
+# print(subjects)
 
 
 
