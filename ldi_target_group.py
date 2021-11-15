@@ -286,29 +286,45 @@ def count_language(forms_data):
 
 
 
-def plot_districts():pass
-
-
-def plot_cities():pass
-
-
-def plot_gender(gender_arr):
-    names = ['group_a', 'group_b', 'group_c']
-    values = [1, 10, 100]
-
-    plt.figure(figsize=(9, 3))
-
-    plt.subplot(131)
+def plot_districts(arr):
+    names, values = [x[0] for x in arr], [y[1] for y in arr]
+    plt.style.use('ggplot')
+    fig, ax = plt.subplots(figsize=(9, 7))
     plt.bar(names, values)
-    plt.subplot(132)
-    plt.scatter(names, values)
-    plt.subplot(133)
-    plt.plot(names, values)
-    plt.suptitle('Categorical Plotting')
+    fig.autofmt_xdate()
+    plt.ylabel('% Procent')
+    plt.suptitle('Z ktorych okregow splywaja zapytania.')
     plt.show()
 
 
-def plot_age():pass
+def plot_cities(arr):
+    names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
+    plt.figure(figsize=(5, 5))
+
+    plt.bar(names, values)
+    plt.ylabel('% Procent')
+    plt.suptitle('Z ktorych miast splywaja zapytania.')
+    plt.show()
+
+
+def plot_gender(arr):
+    names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
+    plt.figure(figsize=(5, 5))
+
+    plt.bar(names, values)
+    plt.ylabel('% Procent')
+    plt.suptitle('Płeć osób składających zapytania.')
+    plt.show()
+
+
+def plot_age(arr):
+    names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
+    plt.figure(figsize=(5, 5))
+
+    plt.bar(names, values)
+    plt.ylabel('% Procent')
+    plt.suptitle('Wiek osób składających zapytania.')
+    plt.show()
 
 
 
@@ -326,11 +342,21 @@ gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
 
+districts_arr = percentage(district_counts)
 pprint(percentage(district_counts))
+
+cities_arr = percentage(city_counts)
 pprint(percentage(city_counts))
+
 gender_arr = percentage(gender_counts)
 pprint(gender_arr)
-pprint(percentage(lang_counts))
-pprint(percentage(age_counts))
 
+pprint(percentage(lang_counts))
+
+age_arr = percentage(age_counts)
+pprint(age_arr)
+
+plot_districts(districts_arr)
+# plot_cities(cities_arr)
 # plot_gender(gender_arr)
+# plot_age(age_arr)
