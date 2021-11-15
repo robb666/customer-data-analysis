@@ -34,20 +34,20 @@ from pprint import pprint
 
 
 def plot_gender(arr):
-    names = ['Males', 'Females']
-    # values = [84.6, 15.4]
-    names, values = list(map(lambda x, y: x[0], y[1], [('Males', 84.6), ('Females', 15.4)]))
-    print(names, values)
-    # plt.figure(figsize=(5, 5))
-    #
-    # # plt.subplot()
-    # plt.bar(names, values)
-    # # plt.subplot(132)
-    # # plt.scatter(names, values)
-    # # plt.subplot(133)
-    # # plt.plot(names, values)
-    # plt.suptitle('Płeć osób składających zapytania.')
-    # plt.show()
+
+    names = list(map(lambda x: x[0], arr))
+    values = list(map(lambda y: y[1], arr))
+
+    plt.figure(figsize=(5, 5))
+
+    # plt.subplot()
+    plt.bar(names, values)
+    # plt.subplot(132)
+    # plt.scatter(names, values)
+    # plt.subplot(133)
+    # plt.plot(names, values)
+    plt.suptitle('Płeć osób składających zapytania.')
+    plt.show()
 
 
 arr = [('Males', 84.6), ('Females', 15.4)]
