@@ -299,9 +299,10 @@ def plot_districts(arr):
 
 def plot_cities(arr):
     names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-    plt.figure(figsize=(5, 5))
-
+    plt.style.use('ggplot')
+    fig, ax = plt.subplots(figsize=(9, 7))
     plt.bar(names, values)
+    fig.autofmt_xdate()
     plt.ylabel('% Procent')
     plt.suptitle('Z ktorych miast splywaja zapytania.')
     plt.show()
@@ -319,9 +320,10 @@ def plot_gender(arr):
 
 def plot_age(arr):
     names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-    plt.figure(figsize=(5, 5))
+    plt.style.use('ggplot')
+    plt.figure(figsize=(9, 7))
 
-    plt.bar(names, values)
+    plt.plot(names, values)
     plt.ylabel('% Procent')
     plt.suptitle('Wiek osób składających zapytania.')
     plt.show()
@@ -356,7 +358,7 @@ pprint(percentage(lang_counts))
 age_arr = percentage(age_counts)
 pprint(age_arr)
 
-plot_districts(districts_arr)
+# plot_districts(districts_arr)
 # plot_cities(cities_arr)
 # plot_gender(gender_arr)
-# plot_age(age_arr)
+plot_age(age_arr)
