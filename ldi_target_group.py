@@ -288,14 +288,22 @@ def count_language(forms_data):
 
 def plot(arr):
     names, values = [x[0] for x in arr], [y[1] for y in arr]
-    if isinstance(names, int):
-        plt.style.use('ggplot')
-        plt.figure(figsize=(9, 7))
-        plt.plot(names, values)
-        plt.ylabel('% Procent')
-        plt.suptitle('Wiek osób składających zapytania.')
-        plt.show()
     plt.style.use('ggplot')
+    if isinstance(names[0], int):
+        sns.histplot(names,
+                     bins=range(min(names), max(names) + 1),
+                     stat='percent',
+                     kde=True)
+        plt.show()
+
+        # plt.figure(figsize=(9, 7))
+        # plt.plot(names, values)
+        # plt.ylabel('% Procent')
+        # plt.suptitle('Wiek osób składających zapytania.')
+        # plt.show()
+
+
+        return
     fig, ax = plt.subplots(figsize=(9, 7))
     plt.bar(names, values)
     fig.autofmt_xdate()

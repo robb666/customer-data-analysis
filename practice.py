@@ -33,18 +33,60 @@ from pprint import pprint
 
 
 
-def plot_gender(arr):
-    names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-    plt.figure(figsize=(5, 5))
-
-    plt.bar(names, values)
-    plt.ylabel('% Procent')
-    plt.suptitle('Płeć osób składających zapytania.')
+def plot(arr):
+    names, values = [x[0] for x in arr], [y[1] for y in arr]
+    plt.style.use('ggplot')
+    sns.histplot(names, bins=range(min(names), max(names) + 1), stat='percent',  kde=True)
     plt.show()
 
 
-arr = [('Males', 84.6), ('Females', 15.4)]
-plot_gender(arr)
+arr = [(1941, 0.6),
+       (1950, 0.6),
+       (1951, 1.2),
+       (1953, 0.6),
+       (1954, 0.6),
+       (1955, 1.2),
+       (1957, 1.2),
+       (1959, 1.2),
+       (1962, 1.2),
+       (1963, 1.2),
+       (1966, 0.6),
+       (1969, 1.2),
+       (1970, 2.4),
+       (1971, 0.6),
+       (1973, 0.6),
+       (1974, 2.4),
+       (1975, 1.8),
+       (1976, 1.2),
+       (1977, 2.4),
+       (1978, 2.4),
+       (1979, 1.2),
+       (1980, 1.2),
+       (1981, 3.6),
+       (1982, 1.8),
+       (1983, 2.4),
+       (1984, 5.4),
+       (1985, 2.4),
+       (1986, 5.4),
+       (1987, 1.2),
+       (1988, 2.4),
+       (1989, 3.0),
+       (1990, 3.6),
+       (1991, 4.8),
+       (1992, 4.2),
+       (1993, 4.2),
+       (1994, 4.2),
+       (1995, 4.2),
+       (1996, 5.4),
+       (1997, 3.6),
+       (1998, 4.2),
+       (1999, 3.0),
+       (2000, 1.8),
+       (2001, 0.6),
+       (2002, 0.6),
+       (2003, 0.6)]
+
+plot(arr)
 
 
 
