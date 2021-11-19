@@ -17,6 +17,7 @@ from itertools import chain
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pprint import pprint
+import pandas as pd
 
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -283,25 +284,17 @@ def count_language(forms_data):
     return language_counts
 
 
-
-
-
 def plot(arr):
     names, values = [x[0] for x in arr], [y[1] for y in arr]
     plt.style.use('ggplot')
     if isinstance(names[0], int):
-        sns.histplot(names,
+        df = pd.DataFrame({'Rok urodzenia': names,
+                           'Procent': values})
+        plt.ylim(0, 1)
+        sns.histplot(data=df, x=df['Rok urodzenia'],
                      bins=range(min(names), max(names) + 1),
-                     stat='percent',
-                     kde=True)
+                     binwidth=1, kde=True, alpha=0)
         plt.show()
-
-        # plt.figure(figsize=(9, 7))
-        # plt.plot(names, values)
-        # plt.ylabel('% Procent')
-        # plt.suptitle('Wiek osób składających zapytania.')
-        # plt.show()
-
 
         return
     fig, ax = plt.subplots(figsize=(9, 7))
@@ -310,38 +303,6 @@ def plot(arr):
     plt.ylabel('% Procent')
     plt.suptitle('Z ktorych okregow splywaja zapytania.')
     plt.show()
-
-
-# def plot_cities(arr):
-#     names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-#     plt.style.use('ggplot')
-#     fig, ax = plt.subplots(figsize=(9, 7))
-#     plt.bar(names, values)
-#     fig.autofmt_xdate()
-#     plt.ylabel('% Procent')
-#     plt.suptitle('Z ktorych miast splywaja zapytania.')
-#     plt.show()
-#
-#
-# def plot_gender(arr):
-#     names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-#     plt.figure(figsize=(5, 5))
-#
-#     plt.bar(names, values)
-#     plt.ylabel('% Procent')
-#     plt.suptitle('Płeć osób składających zapytania.')
-#     plt.show()
-
-
-# def plot_age(arr):
-#     names, values = list(map(lambda x: x[0], arr)), list(map(lambda y: y[1], arr))
-#     plt.style.use('ggplot')
-#     plt.figure(figsize=(9, 7))
-#     plt.plot(names, values)
-#     plt.ylabel('% Procent')
-#     plt.suptitle('Wiek osób składających zapytania.')
-#     plt.show()
-
 
 
 
@@ -357,7 +318,6 @@ city_counts = count_city(forms_data, largest_cities)
 gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
-
 districts_arr = percentage(district_counts)
 pprint(percentage(district_counts))
 
@@ -372,7 +332,7 @@ pprint(percentage(lang_counts))
 age_arr = percentage(age_counts)
 pprint(age_arr)
 
-# plot(districts_arr)
-# plot(cities_arr)
-# plot(gender_arr)
+plot(districts_arr)
+plot(cities_arr)
+plot(gender_arr)
 plot(age_arr)

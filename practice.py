@@ -36,7 +36,9 @@ from pprint import pprint
 def plot(arr):
     names, values = [x[0] for x in arr], [y[1] for y in arr]
     plt.style.use('ggplot')
-    sns.histplot(names, bins=range(min(names), max(names) + 1), stat='percent',  kde=True)
+    ay = sns.histplot(names, bins=range(min(names), max(names) + 1), stat='percent',  kde=True)
+    # ay = sns.histplot(data=values)
+    ay.set(ylim=(0, 7))
     plt.show()
 
 
@@ -86,6 +88,7 @@ arr = [(1941, 0.6),
        (2002, 0.6),
        (2003, 0.6)]
 
+# arr = ([1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9])
 plot(arr)
 
 
