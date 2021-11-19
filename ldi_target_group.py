@@ -291,17 +291,25 @@ def plot(arr):
         df = pd.DataFrame({'Rok urodzenia': names,
                            'Procent': values})
         plt.ylim(0, 1)
-        sns.histplot(data=df, x=df['Rok urodzenia'],
+        ay = sns.histplot(data=df, x=df['Rok urodzenia'],
                      bins=range(min(names), max(names) + 1),
                      binwidth=1, kde=True, alpha=0)
+        ay.set_title('Wiek osób składających zapytania.')
         plt.show()
-
         return
+
     fig, ax = plt.subplots(figsize=(9, 7))
     plt.bar(names, values)
+    barlist = plt.bar(names, values)
     fig.autofmt_xdate()
     plt.ylabel('% Procent')
-    plt.suptitle('Z ktorych okregow splywaja zapytania.')
+    if names[0].startswith('Okr'):
+        plt.suptitle('Z których okręgow spływaja zapytania.')
+    elif names[0].startswith('War'):
+        plt.suptitle('Miasta z których spływaja zapytania.')
+    else:
+        barlist[1].set_color('plum')
+        plt.suptitle('Płeć osób skladajcych zapytania.')
     plt.show()
 
 
