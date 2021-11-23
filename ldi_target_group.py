@@ -16,8 +16,8 @@ from typing import NamedTuple, Union
 from itertools import chain
 import matplotlib.pyplot as plt
 import seaborn as sns
-from pprint import pprint
 import pandas as pd
+from pprint import pprint
 
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -284,34 +284,37 @@ def count_language(forms_data):
     return language_counts
 
 
-def plot(arr):
-    names, values = [x[0] for x in arr], [y[1] for y in arr]
-    plt.style.use('ggplot')
-    if isinstance(names[0], int):
-        df = pd.DataFrame({'Rok urodzenia': names,
-                           'Procent': values})
-        plt.ylim(0, 1)
-        ay = sns.histplot(data=df, x=df['Rok urodzenia'],
-                     bins=range(min(names), max(names) + 1),
-                     binwidth=1, kde=True, alpha=0)
-        ay.set_title('Wiek osób składających zapytania.')
-        plt.show()
-        return
+def plot_percentage(di):
+    df_local = pd.DataFrame({'Okręgi': [x[0] for x in di['okręgi']],
+                             'Okręg %': [y[1] for y in di['okręgi']],
+                             'Miasta': [x[0] for x in di['miasta']],
+                             'Miasto %': [y[1] for y in di['miasta']]})
 
-    fig, ax = plt.subplots(figsize=(9, 7))
-    plt.bar(names, values)
-    barlist = plt.bar(names, values)
-    fig.autofmt_xdate()
-    plt.ylabel('% Procent')
-    if names[0].startswith('Okr'):
-        plt.suptitle('Z których okręgow spływaja zapytania.')
-    elif names[0].startswith('War'):
-        plt.suptitle('Miasta z których spływaja zapytania.')
-    else:
-        barlist[1].set_color('plum')
-        plt.suptitle('Płeć osób skladajcych zapytania.')
+    df_gen = pd.DataFrame({'Płeć': [x[0] for x in di['płcie']],
+                           'Płeć %': [y[1] for y in di['płcie']]})
+
+    df_age = pd.DataFrame({'Rocznik': [x[0] for x in di['roczniki']],
+                           'Rocznik %': [y[1] for y in di['roczniki']]})
+
+    sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.barplot(x='Okręgi', y='Okręg %', data=df_local)
+    ax.set_title('Z których okręgow spływaja zapytania.')
     plt.show()
 
+    sns.set(rc={'figure.figsize': (6, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.barplot(x='Miasta', y='Miasto %', data=df_local)
+    ax.set_title('Miasta z których spływaja zapytania.')
+    plt.show()
+
+    sns.set(rc={'figure.figsize': (18, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.barplot(x='Rocznik', y='Rocznik %', data=df_age)
+    ax.set_title('Rocznik osób składających zapytania.')
+    plt.show()
+
+    sns.set(rc={'figure.figsize': (5, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.barplot(x='Płeć', y='Płeć %', data=df_gen)
+    ax.set_title('Płeć osób skladajcych zapytania.')
+    plt.show()
 
 
 subjects = []
@@ -326,21 +329,19 @@ city_counts = count_city(forms_data, largest_cities)
 gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
+
 districts_arr = percentage(district_counts)
-pprint(percentage(district_counts))
 
 cities_arr = percentage(city_counts)
-pprint(percentage(city_counts))
 
 gender_arr = percentage(gender_counts)
-pprint(gender_arr)
-
-pprint(percentage(lang_counts))
 
 age_arr = percentage(age_counts)
-pprint(age_arr)
 
-plot(districts_arr)
-plot(cities_arr)
-plot(gender_arr)
-plot(age_arr)
+di = {}
+di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
+
+plot_percentage(di)
+
+
+
