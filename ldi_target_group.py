@@ -301,7 +301,7 @@ def plot_percentage(di):
     ax.set_title('Z których okręgow spływaja zapytania.')
     plt.show()
 
-    sns.set(rc={'figure.figsize': (6, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.barplot(x='Miasta', y='Miasto %', data=df_local)
     ax.set_title('Miasta z których spływaja zapytania.')
     plt.show()
@@ -311,7 +311,7 @@ def plot_percentage(di):
     ax.set_title('Rocznik osób składających zapytania.')
     plt.show()
 
-    sns.set(rc={'figure.figsize': (5, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    sns.set(rc={'figure.figsize': (6, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.barplot(x='Płeć', y='Płeć %', data=df_gen)
     ax.set_title('Płeć osób skladajcych zapytania.')
     plt.show()
