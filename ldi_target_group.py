@@ -225,10 +225,11 @@ def count_district(forms_data, all_districts):
 
 
 def percentage(counts: dict) -> list:
+    counts_to_perc = {}
     all_dist = sum(counts.values())
     for item in counts:
-        counts[item] = round((counts[item] / all_dist) * 100, 1)
-    return sort_dict(counts)
+        counts_to_perc[item] = round((counts[item] / all_dist) * 100, 1)
+    return sort_dict(counts_to_perc)
 
 
 def sort_dict(di: dict) -> list:
@@ -285,16 +286,16 @@ def count_language(forms_data):
 
 
 def plot_percentage(di):
-    df_local = pd.DataFrame({'Okręgi': [x[0] for x in di['okręgi']],
+    df_local = pd.DataFrame({'Okręgi':  [x[0] for x in di['okręgi']],
                              'Okręg %': [y[1] for y in di['okręgi']],
-                             'Miasta': [x[0] for x in di['miasta']],
-                             'Miasto %': [y[1] for y in di['miasta']]})
+                             'Miasta':  [x[0] for x in di['miasta']],
+                             'Miasto %':[y[1] for y in di['miasta']]})
 
-    df_gen = pd.DataFrame({'Płeć': [x[0] for x in di['płcie']],
-                           'Płeć %': [y[1] for y in di['płcie']]})
+    df_gen = pd.DataFrame({'Płeć':  [x[0] for x in di['płcie']],
+                           'Płeć %':[y[1] for y in di['płcie']]})
 
-    df_age = pd.DataFrame({'Rocznik': [x[0] for x in di['roczniki']],
-                           'Rocznik %': [y[1] for y in di['roczniki']]})
+    df_age = pd.DataFrame({'Rocznik':  [x[0] for x in di['roczniki']],
+                           'Rocznik %':[y[1] for y in di['roczniki']]})
 
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.barplot(x='Okręgi', y='Okręg %', data=df_local)
@@ -331,17 +332,16 @@ lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
 
 districts_arr = percentage(district_counts)
-
 cities_arr = percentage(city_counts)
-
 gender_arr = percentage(gender_counts)
-
 age_arr = percentage(age_counts)
 
-di = {}
-di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
+# di = {}
+# di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
+# plot_percentage(di)
 
-plot_percentage(di)
-
-
+print(districts_arr)
+print(cities_arr)
+print(gender_arr)
+print(age_arr)
 
