@@ -27,14 +27,14 @@ def _add(ids, msg, err):
     form, query_date = {}, ''
     for item in msg['payload']['headers']:
         if item.get('name') == 'Date':
-            query_date = item['value']
-            print(query_date)
+            query_date = datetime.strptime(item['value'], '%a, %d %b %Y %H:%M:%S %z')
 
     body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
+
     form['message id'] = msg['id']
-    form['data'] = query_date
-    # form['dzień tygodnia'] =
-    # form['godzina'] =
+    form['data'] = query_date.date().strftime('%Y.%m.%d')
+    form['dzień tygodnia'] = query_date.strftime('%A')
+    form['godzina'] = query_date.time().strftime('%H:%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
     form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
@@ -333,7 +333,7 @@ batch_request(service)
 forms_data = eliminate_duplicates(subjects)
 forms_data = eliminate_falsyficates(forms_data)
 
-# print(forms_data)
+print(forms_data)
 
 district_counts = count_district(forms_data, all_districts)
 city_counts = count_city(forms_data, largest_cities)
