@@ -377,9 +377,6 @@ def plot_pandas(forms_data):
     plt.show()
 
 
-
-
-
 subjects = []
 service = authentication()
 batch_request(service)
