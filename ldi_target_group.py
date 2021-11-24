@@ -223,10 +223,6 @@ largest_cities = [Cities('Warszawa', range(0, 5)),
                   Cities('Łódź', range(90, 95))]
 
 
-def pandas_frame(api_data):
-    return pd.DataFrame(api_data, dtype=object)
-
-
 def insert_district(forms_data, all_districts):
     for data in forms_data:
         for district in all_districts:
@@ -247,7 +243,6 @@ def insert_age(forms_data):
     for data in forms_data:
         pesel = data['nr_pesel']
         if age := pesel_birth(pesel):
-            print(age)
             if isinstance(age, str):
                 continue
             data['rocznik'] = round(age)
@@ -370,6 +365,21 @@ def plot_percentage(di):
     plt.show()
 
 
+def pandas_frame(api_data):
+    return pd.DataFrame(api_data, dtype=object)
+
+
+def plot_pandas(forms_data):
+    print(forms_data)
+    sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.lineplot(x='rocznik', y='godzina', data=forms_data)
+    # ax.set_title('Z których okręgow spływaja zapytania.')
+    plt.show()
+
+
+
+
+
 subjects = []
 service = authentication()
 batch_request(service)
@@ -409,4 +419,5 @@ insert_gender(forms_data)
 # print(district_counts)
 # print(forms_data)
 
-print(pandas_frame(forms_data))
+data_form = pandas_frame(forms_data)
+plot_pandas(data_form)
