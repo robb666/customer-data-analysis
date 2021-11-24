@@ -19,6 +19,11 @@ import seaborn as sns
 import pandas as pd
 from pprint import pprint
 
+pd.options.display.max_rows = 999
+pd.set_option('display.max_columns', 40)
+pd.set_option('max_colwidth', 1000)
+pd.set_option('display.width', 1000)
+
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
@@ -33,7 +38,7 @@ def _add(ids, msg, err):
 
     form['message id'] = msg['id']
     form['data'] = query_date.date().strftime('%Y.%m.%d')
-    form['dzień tygodnia'] = query_date.strftime('%A')
+    form['dzień'] = query_date.strftime('%A')
     form['godzina'] = query_date.time().strftime('%H:%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
@@ -218,6 +223,45 @@ largest_cities = [Cities('Warszawa', range(0, 5)),
                   Cities('Łódź', range(90, 95))]
 
 
+def pandas_frame(api_data):
+    return pd.DataFrame(api_data, dtype=object)
+
+
+def insert_district(forms_data, all_districts):
+    for data in forms_data:
+        for district in all_districts:
+            if data['kod_poczt'] and int(data['kod_poczt'][0]) == district.code:
+                data['okreg'] = district.name
+    return forms_data
+
+
+def insert_city(forms_data, largest_cities):
+    for data in forms_data:
+        for city in largest_cities:
+            if data['kod_poczt'] and int(data['kod_poczt'][:2]) in city.code_range:
+                data['miasto'] = city.name
+    return forms_data
+
+
+def insert_age(forms_data):
+    for data in forms_data:
+        pesel = data['nr_pesel']
+        if age := pesel_birth(pesel):
+            print(age)
+            if isinstance(age, str):
+                continue
+            data['rocznik'] = round(age)
+    return forms_data
+
+
+def insert_gender(forms_data):
+    for data in forms_data:
+        pesel = data['nr_pesel']
+        if gender := pesel_gender(pesel):
+            data['plec'] = gender
+    return forms_data
+
+
 def count_district(forms_data, all_districts):
     district_counts = {}
     for data in forms_data:
@@ -333,7 +377,6 @@ batch_request(service)
 forms_data = eliminate_duplicates(subjects)
 forms_data = eliminate_falsyficates(forms_data)
 
-print(forms_data)
 
 district_counts = count_district(forms_data, all_districts)
 city_counts = count_city(forms_data, largest_cities)
@@ -341,10 +384,11 @@ gender_counts = count_gender(forms_data)
 lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
 
-districts_arr = percentage(district_counts)
-cities_arr = percentage(city_counts)
-gender_arr = percentage(gender_counts)
-age_arr = percentage(age_counts)
+
+# districts_arr = percentage(district_counts)
+# cities_arr = percentage(city_counts)
+# gender_arr = percentage(gender_counts)
+# age_arr = percentage(age_counts)
 
 # di = {}
 # di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
@@ -355,3 +399,14 @@ age_arr = percentage(age_counts)
 # print(cities_arr)
 # print(gender_arr)
 # print(age_arr)
+
+
+insert_district(forms_data, all_districts)
+insert_city(forms_data, largest_cities)
+insert_age(forms_data)
+insert_gender(forms_data)
+
+# print(district_counts)
+# print(forms_data)
+
+print(pandas_frame(forms_data))
