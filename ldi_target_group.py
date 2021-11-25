@@ -373,8 +373,8 @@ def plot_pandas(forms_data):
     print(forms_data)
     godzina = forms_data['godzina'].astype('int')
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.scatterplot(x='dzien', y='rocznik', data=forms_data, hue='plec')
-    # # ax.set_title('Tyt. wykresu.')
+    ax = sns.scatterplot(x='dzien', y='rocznik', data=forms_data, hue='plec', style='2_raty')
+    ax.set_title('Aplikacja "Kalkulator OC"')
     plt.show()
 
 
