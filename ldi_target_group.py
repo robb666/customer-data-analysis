@@ -38,7 +38,7 @@ def _add(ids, msg, err):
 
     form['message id'] = msg['id']
     form['data'] = query_date.date().strftime('%Y.%m.%d')
-    form['dzień'] = query_date.weekday()   #  .strftime('%A')
+    form['dzien'] = query_date # .strftime('%A')
     form['godzina'] = query_date.time().strftime('%H')     #  :%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
@@ -160,8 +160,8 @@ def pesel_birth(p):
 def pesel_gender(p):
     if pesel_birth(p):
         if int(p[-2]) % 2 == 1:
-            return 'Males'
-        return 'Females'
+            return 'Male(s)'
+        return 'Female(s)'
 
 
 def eliminate_duplicates(subjects):
@@ -366,16 +366,15 @@ def plot_percentage(di):
 
 
 def pandas_frame(api_data):
-    return pd.DataFrame(api_data) #, dtype=object)
+    return pd.DataFrame(api_data, dtype=object)
 
 
 def plot_pandas(forms_data):
-    # forms_data.to_datetime('godzina')
-    print(forms_data.sort_values(by=['godzina']))
-
+    print(forms_data)
+    godzina = forms_data['godzina'].astype('int')
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.histplot(x='godzina', data=forms_data)
-    # ax.set_title('Z których okręgow spływaja zapytania.')
+    ax = sns.scatterplot(x='dzien', y='rocznik', data=forms_data, hue='plec')
+    # # ax.set_title('Tyt. wykresu.')
     plt.show()
 
 
