@@ -38,8 +38,8 @@ def _add(ids, msg, err):
 
     form['message id'] = msg['id']
     form['data'] = query_date.date().strftime('%Y.%m.%d')
-    form['dzień'] = query_date.strftime('%A')
-    form['godzina'] = query_date.time().strftime('%H:%M')
+    form['dzień'] = query_date.weekday()   #  .strftime('%A')
+    form['godzina'] = query_date.time().strftime('%H')     #  :%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
     form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
@@ -366,13 +366,15 @@ def plot_percentage(di):
 
 
 def pandas_frame(api_data):
-    return pd.DataFrame(api_data, dtype=object)
+    return pd.DataFrame(api_data) #, dtype=object)
 
 
 def plot_pandas(forms_data):
-    print(forms_data)
+    # forms_data.to_datetime('godzina')
+    print(forms_data.sort_values(by=['godzina']))
+
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.lineplot(x='rocznik', y='godzina', data=forms_data)
+    ax = sns.histplot(x='godzina', data=forms_data)
     # ax.set_title('Z których okręgow spływaja zapytania.')
     plt.show()
 
