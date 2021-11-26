@@ -37,9 +37,9 @@ def _add(ids, msg, err):
     body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
 
     form['message id'] = msg['id']
-    form['data'] = query_date.date().strftime('%Y.%m.%d')
-    form['dzien'] = query_date # .strftime('%A')
-    form['godzina'] = query_date.time().strftime('%H')     #  :%M')
+    form['data'] = query_date.date()#.strftime('%Y.%m.%d')
+    form['dzień'] = query_date#.weekday() #.strftime('%A')
+    form['godzina'] = query_date.time() #.strftime('%H')     #  :%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
     form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
@@ -245,7 +245,7 @@ def insert_age(forms_data):
         if age := pesel_birth(pesel):
             if isinstance(age, str):
                 continue
-            data['rocznik'] = round(age)
+            data['rocznik klienta'] = round(age)
     return forms_data
 
 
@@ -253,7 +253,7 @@ def insert_gender(forms_data):
     for data in forms_data:
         pesel = data['nr_pesel']
         if gender := pesel_gender(pesel):
-            data['plec'] = gender
+            data['płeć'] = gender
     return forms_data
 
 
@@ -333,16 +333,16 @@ def count_language(forms_data):
 
 
 def plot_percentage(di):
-    df_local = pd.DataFrame({'Okręgi':  [x[0] for x in di['okręgi']],
+    df_local = pd.DataFrame({'Okręgi': [x[0] for x in di['okręgi']],
                              'Okręg %': [y[1] for y in di['okręgi']],
-                             'Miasta':  [x[0] for x in di['miasta']],
-                             'Miasto %':[y[1] for y in di['miasta']]})
+                             'Miasta': [x[0] for x in di['miasta']],
+                             'Miasto %': [y[1] for y in di['miasta']]})
 
-    df_gen = pd.DataFrame({'Płeć':  [x[0] for x in di['płcie']],
-                           'Płeć %':[y[1] for y in di['płcie']]})
+    df_gen = pd.DataFrame({'Płeć': [x[0] for x in di['płcie']],
+                           'Płeć %': [y[1] for y in di['płcie']]})
 
-    df_age = pd.DataFrame({'Rocznik':  [x[0] for x in di['roczniki']],
-                           'Rocznik %':[y[1] for y in di['roczniki']]})
+    df_age = pd.DataFrame({'Rocznik': [x[0] for x in di['roczniki']],
+                           'Ilość procentowo %': [y[1] for y in di['roczniki']]})
 
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.barplot(x='Okręgi', y='Okręg %', data=df_local)
@@ -355,7 +355,7 @@ def plot_percentage(di):
     plt.show()
 
     sns.set(rc={'figure.figsize': (18, 6)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.barplot(x='Rocznik', y='Rocznik %', data=df_age)
+    ax = sns.barplot(x='Rocznik', y='Ilość procentowo %', data=df_age)
     ax.set_title('Rocznik osób składających zapytania.')
     plt.show()
 
@@ -370,12 +370,18 @@ def pandas_frame(api_data):
 
 
 def plot_pandas(forms_data):
-    print(forms_data)
-    godzina = forms_data['godzina'].astype('int')
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.scatterplot(x='dzien', y='rocznik', data=forms_data, hue='plec', style='2_raty')
-    ax.set_title('Aplikacja "Kalkulator OC"')
+    ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć', style='2_raty')
+    ax.set_title('Zapytania "Kalkulator OC" - 26.11.2021')
     plt.show()
+
+    forms_data = forms_data.sort_values(by=['dzień'], ascending=False)
+    sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
+    ax = sns.histplot(forms_data['rocznik klienta'], kde=True)
+    ax.set_title('"Wiek"')
+    plt.show()
+
+
 
 
 subjects = []
@@ -393,21 +399,20 @@ lang_counts = count_language(forms_data)
 age_counts = count_age(forms_data)
 
 
-# districts_arr = percentage(district_counts)
-# cities_arr = percentage(city_counts)
-# gender_arr = percentage(gender_counts)
-# age_arr = percentage(age_counts)
+districts_arr = percentage(district_counts)
+cities_arr = percentage(city_counts)
+gender_arr = percentage(gender_counts)
+age_arr = percentage(age_counts)
 
-# di = {}
-# di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
-# plot_percentage(di)
+di = {}
+di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
+plot_percentage(di)
 
 # print(districts_arr)
 # print(district_counts)
 # print(cities_arr)
 # print(gender_arr)
 # print(age_arr)
-
 
 insert_district(forms_data, all_districts)
 insert_city(forms_data, largest_cities)
