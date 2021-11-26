@@ -1,14 +1,11 @@
 from __future__ import print_function
 import pickle
 import os.path
-import time
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-from datetime import date, timedelta
 import base64
 import re
-import numpy as np
 import phonenumbers
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -17,7 +14,7 @@ from itertools import chain
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-from pprint import pprint
+
 
 pd.options.display.max_rows = 999
 pd.set_option('display.max_columns', 40)
@@ -37,9 +34,9 @@ def _add(ids, msg, err):
     body = base64.urlsafe_b64decode(msg.get("payload").get("body").get("data").encode("ASCII")).decode("utf-8")
 
     form['message id'] = msg['id']
-    form['data'] = query_date.date()#.strftime('%Y.%m.%d')
-    form['dzień'] = query_date#.weekday() #.strftime('%A')
-    form['godzina'] = query_date.time() #.strftime('%H')     #  :%M')
+    form['data'] = query_date.date()  #.strftime('%Y.%m.%d')
+    form['dzień'] = query_date  #.weekday() #.strftime('%A')
+    form['godzina'] = query_date.time()  #.strftime('%H')     #  :%M')
     form['imię'] = re.search('Imię:\s(\w+)', body).group(1) if re.search('Imię:\s(\w+)',
                                                                                    body) else ''
     form['nazwisko'] = body.split('<br>')[1].rstrip().split(' ')[-1]
@@ -380,8 +377,6 @@ def plot_pandas(forms_data):
     ax = sns.histplot(forms_data['rocznik klienta'], kde=True)
     ax.set_title('"Wiek"')
     plt.show()
-
-
 
 
 subjects = []
