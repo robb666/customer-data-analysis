@@ -370,6 +370,7 @@ def plot_pandas(forms_data):
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć')
     ax.set_title('Zapytania "Kalkulator OC" - 26.11.2021')
+    plt.legend(loc='lower left')
     plt.show()
 
     forms_data = forms_data.sort_values(by=['dzień'], ascending=False)
@@ -401,7 +402,7 @@ age_arr = percentage(age_counts)
 
 di = {}
 di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
-plot_percentage(di)
+# plot_percentage(di)  <---
 
 # print(districts_arr)
 # print(district_counts)
