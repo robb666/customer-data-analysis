@@ -99,7 +99,7 @@ def authentication():
 def batch_request(service):
     """Batch request to Gmail API."""
     today = date.today()
-    after = (today - timedelta(400)).strftime('%Y/%m/%d')
+    after = (today - timedelta(500)).strftime('%Y/%m/%d')
     before = (today - timedelta(0)).strftime('%Y/%m/%d')
 
     query = f'after:{after} before:{before}'
@@ -368,7 +368,7 @@ def pandas_frame(api_data):
 
 def plot_pandas(forms_data):
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć', style='2_raty')
+    ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć')
     ax.set_title('Zapytania "Kalkulator OC" - 26.11.2021')
     plt.show()
 
