@@ -402,7 +402,7 @@ age_arr = percentage(age_counts)
 
 di = {}
 di['okręgi'], di['miasta'], di['płcie'], di['roczniki'] = districts_arr, cities_arr, gender_arr, age_arr
-# plot_percentage(di)  <---
+plot_percentage(di)  # <---
 
 # print(districts_arr)
 # print(district_counts)
