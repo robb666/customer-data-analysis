@@ -369,7 +369,7 @@ def pandas_frame(api_data):
 def plot_pandas(forms_data):
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
     ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć')
-    ax.set_title('Zapytania "Kalkulator OC" - 26.11.2021')
+    ax.set_title(f'Zapytania "Kalkulator OC" - {datetime.today().strftime("%d.%m.%Y")} roku.')
     plt.legend(loc='lower left')
     plt.show()
 
