@@ -330,10 +330,14 @@ def count_language(forms_data):
 
 
 def plot_percentage(di):
+    print(di)
+    for d in di:
+        print(d)
     df_local = pd.DataFrame({'Okręgi': [x[0] for x in di['okręgi']],
-                             'Okręg %': [y[1] for y in di['okręgi']],
-                             'Miasta': [x[0] for x in di['miasta']],
-                             'Miasto %': [y[1] for y in di['miasta']]})
+                             'Okręg %': [y[1] for y in di['okręgi']]})
+
+    df_city = pd.DataFrame({'Miasta': [x[0] for x in di['miasta']],
+                            'Miasto %': [y[1] for y in di['miasta']]})
 
     df_gen = pd.DataFrame({'Płeć': [x[0] for x in di['płcie']],
                            'Płeć %': [y[1] for y in di['płcie']]})
@@ -347,7 +351,7 @@ def plot_percentage(di):
     plt.show()
 
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.barplot(x='Miasta', y='Miasto %', data=df_local)
+    ax = sns.barplot(x='Miasta', y='Miasto %', data=df_city)
     ax.set_title('Miasta z których spływaja zapytania.')
     plt.show()
 
@@ -368,7 +372,11 @@ def pandas_frame(api_data):
 
 def plot_pandas(forms_data):
     sns.set(rc={'figure.figsize': (8, 8)}); fig, ax = plt.subplots(); fig.autofmt_xdate()
-    ax = sns.scatterplot(x='dzień', y='rocznik klienta', data=forms_data, hue='płeć')
+
+    ax = sns.scatterplot(x='dzień', y='rocznik klienta',
+                         data=forms_data,
+                         hue='płeć',
+                         palette=['#FA8072', '#2980b9'])
     ax.set_title(f'Zapytania "Kalkulator OC" - {datetime.today().strftime("%d.%m.%Y")} roku.')
     plt.legend(loc='lower left')
     plt.show()
